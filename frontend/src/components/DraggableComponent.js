@@ -11,7 +11,7 @@ const DraggableComponent = ({ type, children }) => {
   }));
 
   return (
-    <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+    <div ref={drag} style={{ opacity: isDragging ? 0.5 : 1, cursor: 'move' }}>
       {children}
     </div>
   );

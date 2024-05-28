@@ -1,10 +1,13 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
+import './DropZone.css';
 
 const DropZone = ({ onDrop }) => {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'COMPONENT',
-    drop: (item) => onDrop(item),
+    drop: (item) => {
+      onDrop(item);
+    },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
@@ -13,13 +16,9 @@ const DropZone = ({ onDrop }) => {
   return (
     <div
       ref={drop}
-      style={{
-        border: '1px solid black',
-        minHeight: '400px',
-        backgroundColor: isOver ? 'lightgreen' : 'white',
-      }}
+      className={`drop-zone ${isOver ? 'is-over' : ''}`}
     >
-      Drop components here
+      {isOver ? "Release to drop" : "Drag components here"}
     </div>
   );
 };

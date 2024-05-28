@@ -1,15 +1,19 @@
 import React from 'react';
 import DraggableComponent from './DraggableComponent';
+import './ComponentLibrary.css';
 
 const ComponentLibrary = () => {
   return (
-    <div className="sidebar">
-      <h3>Component Library</h3>
-      <DraggableComponent type="Button">
-        <button>Button</button>
+    <div className="component-library">
+      <h2>Component Library</h2>
+      <DraggableComponent type="Text">
+        <button className="library-item">Text</button>
       </DraggableComponent>
-      <DraggableComponent type="Input">
-        <input placeholder="Input" />
+      <DraggableComponent type="Image">
+        <button className="library-item">Image</button>
+      </DraggableComponent>
+      <DraggableComponent type="Button">
+        <button className="library-item">Button</button>
       </DraggableComponent>
     </div>
   );

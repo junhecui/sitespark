@@ -1,0 +1,17 @@
+.component-library {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .library-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: move;
+    width: 100%;
+    text-align: center;
+  }
+  
