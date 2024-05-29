@@ -14,10 +14,7 @@ const DropZone = ({ onDrop }) => {
   }));
 
   return (
-    <div
-      ref={drop}
-      className={`drop-zone ${isOver ? 'is-over' : ''}`}
-    >
+    <div ref={drop} className={`drop-zone ${isOver ? 'is-over' : ''}`}>
       {isOver ? "Release to drop" : "Drag components here"}
     </div>
   );
