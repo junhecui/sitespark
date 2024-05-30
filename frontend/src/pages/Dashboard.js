@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DragDrop from '../components/DragDrop';
 import { getWidgets } from '../services/api';
 import FormWidget from '../components/widgets/FormWidget';
+import ChartWidget from '../components/widgets/ChartWidget';
 
 function Dashboard() {
   const [items, setItems] = useState([]);
@@ -15,7 +16,7 @@ function Dashboard() {
       const response = await getWidgets();
       const fetchedItems = response.data.map((widget) => ({
         id: widget.id,
-        content: <FormWidget key={widget.id} data={widget.data} />
+        content: widget.type === 'chart' ? <ChartWidget key={widget.id} data={widget.data} /> : <FormWidget key={widget.id} data={widget.data} />
       }));
       setItems(fetchedItems);
     } catch (error) {
@@ -31,12 +32,11 @@ function Dashboard() {
     const [removed] = reorderedItems.splice(result.source.index, 1);
     reorderedItems.splice(result.destination.index, 0, removed);
     setItems(reorderedItems);
-    // Optionally update widget positions in the backend if needed
   };
 
   return (
     <div>
-      <h1>Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
       <DragDrop items={items} onDragEnd={handleDragEnd} />
     </div>
   );
