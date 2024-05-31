@@ -12,10 +12,6 @@ function Dashboard() {
   const [widgetType, setWidgetType] = useState('');
   const [widgetData, setWidgetData] = useState('');
 
-  useEffect(() => {
-    fetchWidgets();
-  }, []);
-
   const fetchWidgets = async () => {
     try {
       const response = await getWidgets();
@@ -42,14 +38,18 @@ function Dashboard() {
         }
         return {
           id: widget.id,
-          content: WidgetComponent ? <WidgetComponent key={widget.id} id={widget.id} data={widget.data} onDelete={handleDelete} /> : null,
+          content: WidgetComponent ? <WidgetComponent key={widget.id} id={widget.id} data={widget.data} onDelete={() => handleDelete(widget.id)} /> : null,
         };
       });
       setItems(fetchedItems);
     } catch (error) {
       console.error('Error fetching widgets:', error);
     }
-  };
+  };  
+
+  useEffect(() => {
+    fetchWidgets();
+  }, []);
 
   const handleDragEnd = async (result) => {
     if (!result.destination) {
@@ -64,12 +64,13 @@ function Dashboard() {
 
   const handleDelete = async (id) => {
     try {
+      console.log('Deleting widget with id:', id);
       await deleteWidget(id);
       fetchWidgets();
     } catch (error) {
       console.error('Error deleting widget:', error);
     }
-  };
+  };  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
