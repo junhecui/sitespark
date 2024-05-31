@@ -45,7 +45,7 @@ function Dashboard() {
     } catch (error) {
       console.error('Error fetching widgets:', error);
     }
-  };  
+  };
 
   useEffect(() => {
     fetchWidgets();
@@ -70,7 +70,7 @@ function Dashboard() {
     } catch (error) {
       console.error('Error deleting widget:', error);
     }
-  };  
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

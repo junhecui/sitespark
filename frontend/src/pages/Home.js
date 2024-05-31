@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div>
-      <h1>Welcome to Appsmith Clone</h1>
+      <h1>Welcome to Low Code Platform Builder</h1>
       <Link to="/dashboard">Go to Dashboard</Link>
     </div>
   );
