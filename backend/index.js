@@ -2,8 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const widgetRoutes = require('./routes/widgets');
-const { driver } = require('./db/neo4j'); 
-require('dotenv').config({ path: '../.env' });
+const { driver } = require('./db/neo4j');  // Import the driver
 
 const app = express();
 
