@@ -11,19 +11,27 @@ const data = [
   { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
 ];
 
-const ChartWidget = () => {
+const ChartWidget = ({ id, onDelete }) => {
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-        <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="bg-white shadow-md rounded px-4 py-2 mb-4 relative">
+      <button
+        onClick={() => onDelete(id)}
+        className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+      >
+        X
+      </button>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
+          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
