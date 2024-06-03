@@ -5,10 +5,10 @@ const { session } = require('../db/neo4j');
 // Route to create a new widget
 router.post('/widget', async (req, res) => {
   const { id, type, data, pageId } = req.body;
-  
+
   try {
     const result = await session.run(
-      'CREATE (w:Widget {id: $id, type: $type, data: $data, pageId: $pageId}) RETURN w',
+      'MATCH (p:Page {id: $pageId}) CREATE (w:Widget {id: $id, type: $type, data: $data})-[:BELONGS_TO]->(p) RETURN w',
       { id, type, data: JSON.stringify(data), pageId }
     );
     const widget = result.records[0].get('w').properties;
@@ -24,7 +24,10 @@ router.get('/widgets', async (req, res) => {
   const { pageId } = req.query;
 
   try {
-    const result = await session.run('MATCH (w:Widget {pageId: $pageId}) RETURN w', { pageId });
+    const result = await session.run(
+      'MATCH (w:Widget)-[:BELONGS_TO]->(p:Page {id: $pageId}) RETURN w',
+      { pageId }
+    );
     const widgets = result.records.map(record => {
       const widget = record.get('w').properties;
       widget.data = JSON.parse(widget.data);
@@ -55,7 +58,10 @@ router.delete('/widgets', async (req, res) => {
   const { pageId } = req.query;
 
   try {
-    await session.run('MATCH (w:Widget {pageId: $pageId}) DELETE w', { pageId });
+    await session.run(
+      'MATCH (w:Widget)-[:BELONGS_TO]->(p:Page {id: $pageId}) DELETE w',
+      { pageId }
+    );
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting widgets:', error);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import FormWidget from '../components/widgets/FormWidget';
 import ChartWidget from '../components/widgets/ChartWidget';
 import TextWidget from '../components/widgets/TextWidget';
