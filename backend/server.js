@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const widgetRoutes = require('./routes/widgets');
+const pageRoutes = require('./routes/pages');
 const { driver } = require('./db/neo4j'); 
 require('dotenv').config({ path: '../.env' });
 
@@ -13,6 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use('/api', widgetRoutes);
+app.use('/api', pageRoutes);
 
 const PORT = process.env.PORT || 5001;
 

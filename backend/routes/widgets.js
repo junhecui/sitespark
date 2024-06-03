@@ -4,13 +4,12 @@ const { session } = require('../db/neo4j');
 
 // Route to create a new widget
 router.post('/widget', async (req, res) => {
-  const { type, data } = req.body;
-  const id = `widget_${Date.now()}`;
+  const { id, type, data, pageId } = req.body;
   
   try {
     const result = await session.run(
-      'CREATE (w:Widget {id: $id, type: $type, data: $data}) RETURN w',
-      { id, type, data: JSON.stringify(data) } // Serialize data to JSON string
+      'CREATE (w:Widget {id: $id, type: $type, data: $data, pageId: $pageId}) RETURN w',
+      { id, type, data: JSON.stringify(data), pageId }
     );
     const widget = result.records[0].get('w').properties;
     res.status(201).json(widget);
@@ -20,13 +19,15 @@ router.post('/widget', async (req, res) => {
   }
 });
 
-// Route to get all widgets
+// Route to get all widgets for a specific page
 router.get('/widgets', async (req, res) => {
+  const { pageId } = req.query;
+
   try {
-    const result = await session.run('MATCH (w:Widget) RETURN w');
+    const result = await session.run('MATCH (w:Widget {pageId: $pageId}) RETURN w', { pageId });
     const widgets = result.records.map(record => {
       const widget = record.get('w').properties;
-      widget.data = JSON.parse(widget.data); // Deserialize data from JSON string
+      widget.data = JSON.parse(widget.data);
       return widget;
     });
     res.status(200).json(widgets);
@@ -49,13 +50,15 @@ router.delete('/widget/:id', async (req, res) => {
   }
 });
 
-// Route to delete all widgets
+// Route to delete all widgets for a specific page
 router.delete('/widgets', async (req, res) => {
+  const { pageId } = req.query;
+
   try {
-    await session.run('MATCH (w:Widget) DELETE w');
+    await session.run('MATCH (w:Widget {pageId: $pageId}) DELETE w', { pageId });
     res.status(204).send();
   } catch (error) {
-    console.error('Error deleting all widgets:', error);
+    console.error('Error deleting widgets:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });

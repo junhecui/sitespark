@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import FormWidget from '../components/widgets/FormWidget';
 import ChartWidget from '../components/widgets/ChartWidget';
@@ -8,9 +8,9 @@ import TextWidget from '../components/widgets/TextWidget';
 import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
 import Sidebar from '../components/Sidebar';
-import '../index.css'
 
-function Dashboard() {
+function PageEditor() {
+  const { pageId } = useParams();
   const [items, setItems] = useState([]);
   const [availableWidgets] = useState([
     { id: '1', name: 'Chart Widget', type: 'chart' },
@@ -22,7 +22,7 @@ function Dashboard() {
 
   const fetchWidgets = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/widgets');
+      const response = await axios.get(`http://localhost:5001/api/widgets?pageId=${pageId}`);
       const fetchedItems = response.data.map((widget) => {
         let WidgetComponent;
         switch (widget.type) {
@@ -53,7 +53,7 @@ function Dashboard() {
     } catch (error) {
       console.error('Error fetching widgets:', error);
     }
-  }, []);
+  }, [pageId]);
 
   useEffect(() => {
     fetchWidgets();
@@ -71,9 +71,7 @@ function Dashboard() {
   const handleDragEnd = (result) => {
     const { source, destination } = result;
 
-    if (!destination) {
-      return;
-    }
+    if (!destination) return;
 
     if (source.droppableId === 'editor' && destination.droppableId === 'editor') {
       const reorderedItems = Array.from(items);
@@ -83,16 +81,15 @@ function Dashboard() {
       return;
     }
 
-    // Moving from sidebar to editor
     if (source.droppableId === 'availableWidgets' && destination.droppableId === 'editor') {
       const widget = availableWidgets[source.index];
       const newWidget = {
         id: uuidv4(),
         type: widget.type,
-        data: { text: widget.name }, // Ensure data is correctly structured
+        data: { text: widget.name },
       };
 
-      axios.post('http://localhost:5001/api/widget', newWidget)
+      axios.post('http://localhost:5001/api/widget', { ...newWidget, pageId })
         .then(() => {
           fetchWidgets();
         })
@@ -104,13 +101,13 @@ function Dashboard() {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="flex">
+      <div className="flex h-screen">
         <Sidebar widgets={availableWidgets} />
         <div className="flex-1 p-4 bg-gray-100 rounded">
-          <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+          <h1 className="text-2xl font-bold mb-4">Page Editor</h1>
           <Droppable droppableId="editor">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-gray-100 rounded">
+              <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-gray-100 rounded h-full">
                 {items.map((item, index) => (
                   <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(provided) => (
@@ -135,4 +132,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default PageEditor;
