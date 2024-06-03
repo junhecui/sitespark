@@ -9,7 +9,7 @@ const TextWidget = ({ id, data, onDelete }) => {
       >
         X
       </button>
-      <p>{data}</p>
+      <p>{data.text}</p> {}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { Droppable, Draggable } from 'react-beautiful-dnd';
 
 const Sidebar = ({ widgets }) => {
   return (
-    <div className="w-1/4 bg-gray-200 p-4">
+    <div className="w-1/4 bg-gray-200 p-4 h-screen">
       <h2 className="font-bold text-lg mb-4">Widgets</h2>
       <Droppable droppableId="availableWidgets">
         {(provided) => (

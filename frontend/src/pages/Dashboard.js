@@ -1,20 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import DragDrop from '../components/DragDrop';
-import { getWidgets, createWidget, deleteWidget } from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import FormWidget from '../components/widgets/FormWidget';
 import ChartWidget from '../components/widgets/ChartWidget';
 import TextWidget from '../components/widgets/TextWidget';
 import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
+import Sidebar from '../components/Sidebar';
 
 function Dashboard() {
   const [items, setItems] = useState([]);
-  const [widgetType, setWidgetType] = useState('');
-  const [widgetData, setWidgetData] = useState('');
+  const [availableWidgets] = useState([
+    { id: '1', name: 'Chart Widget', type: 'chart' },
+    { id: '2', name: 'Form Widget', type: 'form' },
+    { id: '3', name: 'Text Widget', type: 'text' },
+    { id: '4', name: 'Image Widget', type: 'image' },
+    { id: '5', name: 'Button Widget', type: 'button' },
+  ]);
 
-  const fetchWidgets = async () => {
+  const fetchWidgets = useCallback(async () => {
     try {
-      const response = await getWidgets();
+      const response = await axios.get('http://localhost:5001/api/widgets');
       const fetchedItems = response.data.map((widget) => {
         let WidgetComponent;
         switch (widget.type) {
@@ -45,93 +52,87 @@ function Dashboard() {
     } catch (error) {
       console.error('Error fetching widgets:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWidgets();
-  }, []);
+  }, [fetchWidgets]);
 
-  const handleDragEnd = async (result) => {
-    if (!result.destination) {
-      return;
-    }
-    const reorderedItems = Array.from(items);
-    const [removed] = reorderedItems.splice(result.source.index, 1);
-    reorderedItems.splice(result.destination.index, 0, removed);
-    setItems(reorderedItems);
-    // Optionally update widget positions in the backend if needed
-  };
-
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     try {
-      console.log('Deleting widget with id:', id);
-      await deleteWidget(id);
+      await axios.delete(`http://localhost:5001/api/widget/${id}`);
       fetchWidgets();
     } catch (error) {
       console.error('Error deleting widget:', error);
     }
-  };
+  }, [fetchWidgets]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
+  const handleDragEnd = (result) => {
+    const { source, destination } = result;
+
+    // Dropped outside the list
+    if (!destination) {
+      return;
+    }
+
+    // Reordering within the editor
+    if (source.droppableId === 'editor' && destination.droppableId === 'editor') {
+      const reorderedItems = Array.from(items);
+      const [removed] = reorderedItems.splice(source.index, 1);
+      reorderedItems.splice(destination.index, 0, removed);
+      setItems(reorderedItems);
+      return;
+    }
+
+    // Moving from sidebar to editor
+    if (source.droppableId === 'availableWidgets' && destination.droppableId === 'editor') {
+      const widget = availableWidgets[source.index];
       const newWidget = {
-        id: `widget_${Date.now()}`,
-        type: widgetType,
-        data: widgetData
+        id: uuidv4(),
+        type: widget.type,
+        data: { text: widget.name }, // Ensure data is correctly structured
       };
-      await createWidget(newWidget);
-      fetchWidgets();
-    } catch (error) {
-      console.error('Error creating widget:', error);
+
+      axios.post('http://localhost:5001/api/widget', newWidget)
+        .then(() => {
+          fetchWidgets();
+        })
+        .catch(error => {
+          console.error('Error creating widget:', error);
+        });
     }
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="widgetType">
-            Widget Type
-          </label>
-          <select
-            id="widgetType"
-            value={widgetType}
-            onChange={(e) => setWidgetType(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          >
-            <option value="">Select a widget type</option>
-            <option value="form">Form Widget</option>
-            <option value="chart">Chart Widget</option>
-            <option value="text">Text Widget</option>
-            <option value="image">Image Widget</option>
-            <option value="button">Button Widget</option>
-          </select>
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <div className="flex h-screen">
+        <Sidebar widgets={availableWidgets} />
+        <div className="flex-1 p-4">
+          <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+          <Droppable droppableId="editor">
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-gray-100 rounded h-full">
+                {items.map((item, index) => (
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="p-2 mb-2 bg-white border rounded"
+                      >
+                        {item.content}
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
         </div>
-        <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="widgetData">
-            Widget Data
-          </label>
-          <textarea
-            id="widgetData"
-            value={widgetData}
-            onChange={(e) => setWidgetData(e.target.value)}
-            placeholder="Enter widget data"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div>
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
-            Add Widget
-          </button>
-        </div>
-      </form>
-      <DragDrop items={items} onDragEnd={handleDragEnd} />
-    </div>
+      </div>
+    </DragDropContext>
   );
 }
 
