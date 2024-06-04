@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { session } = require('../db/neo4j');
+const upload = require('../middlewares/upload');
+
+router.post('/upload', upload.single('image'), (req, res) => {
+  res.json({ imageUrl: req.file.location });
+});
 
 // Route to create a new widget
 router.post('/widget', async (req, res) => {
@@ -61,7 +66,7 @@ router.put('/widget/:id', async (req, res) => {
   try {
     const result = await session.run(
       'MATCH (w:Widget {id: $id}) SET w.data = $data RETURN w',
-      { id, data }
+      { id, data: JSON.stringify(data) }
     );
     const widget = result.records[0].get('w').properties;
     res.status(200).json(widget);

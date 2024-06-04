@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const ImageWidget = ({ id, data, onDelete, onUpdate }) => {
   const [imageUrl, setImageUrl] = useState(data.imageUrl || '');
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageUrl(reader.result);
-        onUpdate(id, { imageUrl: reader.result });
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await axios.post('http://localhost:5001/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setImageUrl(response.data.imageUrl);
+        onUpdate(id, { imageUrl: response.data.imageUrl });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
     }
   };
 
