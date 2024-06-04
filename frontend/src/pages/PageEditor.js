@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
+import { v4 as uuidv4 } from 'uuid';
 import FormWidget from '../components/widgets/FormWidget';
 import ChartWidget from '../components/widgets/ChartWidget';
 import TextWidget from '../components/widgets/TextWidget';
@@ -45,9 +45,10 @@ function PageEditor() {
           default:
             WidgetComponent = null;
         }
+        const data = typeof widget.data === 'string' ? JSON.parse(widget.data) : widget.data;
         return {
           id: widget.id,
-          content: WidgetComponent ? <WidgetComponent key={widget.id} id={widget.id} data={widget.data} onDelete={() => handleDelete(widget.id)} /> : null,
+          content: WidgetComponent ? <WidgetComponent key={widget.id} id={widget.id} data={data} onDelete={() => handleDelete(widget.id)} onUpdate={handleUpdate} /> : null,
         };
       });
       setItems(fetchedItems);
@@ -69,6 +70,15 @@ function PageEditor() {
     }
   }, [fetchWidgets]);
 
+  const handleUpdate = useCallback(async (id, data) => {
+    try {
+      await axios.put(`http://localhost:5001/api/widget/${id}`, { data: JSON.stringify(data) });
+      fetchWidgets();
+    } catch (error) {
+      console.error('Error updating widget:', error);
+    }
+  }, [fetchWidgets]);
+
   const handleDragEnd = (result) => {
     const { source, destination } = result;
 
@@ -87,7 +97,7 @@ function PageEditor() {
       const newWidget = {
         id: uuidv4(),
         type: widget.type,
-        data: { text: widget.name },
+        data: JSON.stringify({ text: widget.name }), // Ensure data is correctly structured as JSON string
       };
 
       axios.post('http://localhost:5001/api/widget', { ...newWidget, pageId })

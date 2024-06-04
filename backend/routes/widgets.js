@@ -53,6 +53,24 @@ router.delete('/widget/:id', async (req, res) => {
   }
 });
 
+// Route to update a widget
+router.put('/widget/:id', async (req, res) => {
+  const { id } = req.params;
+  const { data } = req.body;
+
+  try {
+    const result = await session.run(
+      'MATCH (w:Widget {id: $id}) SET w.data = $data RETURN w',
+      { id, data }
+    );
+    const widget = result.records[0].get('w').properties;
+    res.status(200).json(widget);
+  } catch (error) {
+    console.error('Error updating widget:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 // Route to delete all widgets for a specific page
 router.delete('/widgets', async (req, res) => {
   const { pageId } = req.query;

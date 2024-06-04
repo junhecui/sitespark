@@ -1,6 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const ImageWidget = ({ id, data, onDelete }) => {
+const ImageWidget = ({ id, data, onDelete, onUpdate }) => {
+  const [imageUrl, setImageUrl] = useState(data.imageUrl || '');
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageUrl(reader.result);
+        onUpdate(id, { imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="image-widget bg-white shadow-md rounded px-4 py-2 mb-4 relative">
       <button
@@ -9,7 +23,13 @@ const ImageWidget = ({ id, data, onDelete }) => {
       >
         X
       </button>
-      <img src={data} alt="Widget" className="w-full h-auto" />
+      {imageUrl ? (
+        <img src={imageUrl} alt="Uploaded" className="w-full h-auto" />
+      ) : (
+        <div>
+          <input type="file" onChange={handleImageUpload} className="w-full" />
+        </div>
+      )}
     </div>
   );
 };
