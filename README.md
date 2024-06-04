@@ -10,7 +10,7 @@ This low code website builder is an introductory, user-friendly web application 
 
 ## How to Use
 
-1. [Clone repository](https://github.com/junhecui/low-code-platform-builder)
+1. [Clone repository](https://github.com/junhecui/low-code-website-builder)
 2. Create a `.env` file for the following elements: `AWS_SECRET_ACCESS_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_REGION`, `NEO4J_PASSWORD`, `S3_BUCKET_NAME`.
 3. Run `npm install`.
 4. Run `cd frontend` and `npm start`, create another terminal and run `cd backend` and `npm start`.
