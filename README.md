@@ -1,4 +1,4 @@
-# Low Code Platform Builder
+# Low Code Website Builder
 
 This low code website builder is an introductory, user-friendly web application that will allow interested or aspiring website builders to get a feel for designing web pages.
 
