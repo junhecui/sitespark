@@ -1,6 +1,6 @@
-# Low Code Website Builder
+# SiteSpark
 
-This low code website builder is an introductory, user-friendly web application that will allow interested or aspiring website builders to get a feel for designing web pages.
+SiteSpark is an introductory, user-friendly web application that will allow interested or aspiring website builders to get a feel for designing web pages.
 
 ## Technologies Used
 
@@ -10,7 +10,7 @@ This low code website builder is an introductory, user-friendly web application 
 
 ## How to Use
 
-1. [Clone repository](https://github.com/junhecui/low-code-website-builder)
+1. [Clone repository](https://github.com/junhecui/sitespark)
 2. Create a `.env` file for the following elements: `AWS_SECRET_ACCESS_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_REGION`, `NEO4J_PASSWORD`, `S3_BUCKET_NAME`.
 3. Run `npm install`.
 4. Run `cd frontend` and `npm start`, create another terminal and run `cd backend` and `npm start`.
