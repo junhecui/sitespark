@@ -50,7 +50,7 @@ router.delete('/widget/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    await session.run('MATCH (w:Widget {id: $id}) DELETE w', { id });
+    await session.run('MATCH (w:Widget {id: $id}) DETACH DELETE w', { id });
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting widget:', error);

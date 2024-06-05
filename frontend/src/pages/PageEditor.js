@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,6 +9,7 @@ import TextWidget from '../components/widgets/TextWidget';
 import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
 import Sidebar from '../components/Sidebar';
+import '../index.css';
 
 function PageEditor() {
   const { pageId } = useParams();
@@ -20,6 +21,7 @@ function PageEditor() {
     { id: '4', name: 'Image Widget', type: 'image' },
     { id: '5', name: 'Button Widget', type: 'button' },
   ]);
+  const navigate = useNavigate();
 
   const fetchWidgets = useCallback(async () => {
     try {
@@ -110,12 +112,24 @@ function PageEditor() {
     }
   };
 
+  const handleNavigateHome = () => {
+    navigate('/');
+  };
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div className="flex h-screen">
         <Sidebar widgets={availableWidgets} />
         <div className="flex-1 p-4 bg-gray-100 rounded">
-          <h1 className="text-2xl font-bold mb-4">Page Editor</h1>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold">Page Editor</h1>
+            <button
+              onClick={handleNavigateHome}
+              className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Go to Home
+            </button>
+          </div>
           <Droppable droppableId="editor">
             {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps} className="p-4 bg-gray-100 rounded h-full">
