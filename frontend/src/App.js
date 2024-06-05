@@ -1,16 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import PageEditor from './pages/PageEditor'; // A new page editor component
+import PageEditor from './pages/PageEditor';
+import WebsiteList from './pages/WebsiteList';
+import AddWebsite from './pages/AddWebsite';
+import PageList from './pages/PageList';
+import AddPage from './pages/AddPage';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/edit/:pageId" element={<PageEditor />} /> {/* Route for editing a specific page */}
+        <Route path="/" element={<WebsiteList />} />
+        <Route path="/add-website" element={<AddWebsite />} />
+        <Route path="/website/:websiteId/pages" element={<PageList />} />
+        <Route path="/website/:websiteId/add-page" element={<AddPage />} />
+        <Route path="/page/:pageId/edit" element={<PageEditor />} />
       </Routes>
     </Router>
   );

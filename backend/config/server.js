@@ -2,19 +2,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const widgetRoutes = require('../routes/widgets');
-const pageRoutes = require('../routes/pages');
-const { driver } = require('../db/neo4j'); 
-require('dotenv').config({ path: '../../.env' });
+const websiteRoutes = require('../routes/websites');
+const { driver } = require('../db/neo4j');
+require('dotenv').config();
 
 const app = express();
 
 app.use(bodyParser.json());
-
-// Enable CORS for all routes
 app.use(cors());
-
 app.use('/api', widgetRoutes);
-app.use('/api', pageRoutes);
+app.use('/api', websiteRoutes);
 
 const PORT = process.env.PORT || 5001;
 
