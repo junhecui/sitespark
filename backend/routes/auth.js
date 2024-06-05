@@ -19,7 +19,19 @@ router.post('/signup', [
   }
 
   const { username, password } = req.body;
+
   try {
+    // Check if username already exists
+    const userExists = await session.run(
+      'MATCH (u:User {username: $username}) RETURN u',
+      { username }
+    );
+
+    if (userExists.records.length > 0) {
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    // Create new user
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await session.run(
       'CREATE (u:User {id: $id, username: $username, password: $password}) RETURN u',
