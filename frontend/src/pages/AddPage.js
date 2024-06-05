@@ -1,24 +1,33 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const AddPage = () => {
-  const { websiteId } = useParams();
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { websiteId } = useParams();
+  const { token } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newPage = { id: uuidv4(), name };
-    axios.post(`http://localhost:5001/api/website/${websiteId}/page`, newPage)
-      .then(() => navigate(`/website/${websiteId}/pages`))
-      .catch(error => console.error('Error creating page:', error));
+    try {
+      await axios.post(`http://localhost:5001/api/website/${websiteId}/page`, { name }, {
+        headers: {
+          'x-auth-token': token
+        }
+      });
+      navigate(`/website/${websiteId}/pages`);
+    } catch (err) {
+      setError(err.response.data.message || 'Error creating page');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <h1 className="text-2xl font-bold mb-4">Add Page</h1>
+      {error && <p className="text-red-500">{error}</p>}
       <div>
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
           Page Name

@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const AddWebsite = () => {
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { token } = useAuth();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newWebsite = { id: uuidv4(), name };
-    axios.post('http://localhost:5001/api/website', newWebsite)
-      .then(() => navigate('/'))
-      .catch(error => console.error('Error creating website:', error));
+    try {
+      await axios.post('http://localhost:5001/api/website', { name }, {
+        headers: {
+          'x-auth-token': token
+        }
+      });
+      navigate('/');
+    } catch (err) {
+      setError(err.response.data.message || 'Error creating website');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <h1 className="text-2xl font-bold mb-4">Add Website</h1>
+      {error && <p className="text-red-500">{error}</p>}
       <div>
         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
           Website Name

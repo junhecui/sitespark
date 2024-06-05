@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
-const Navigation = ({ token, setToken }) => {
+const Navigation = () => {
+  const { token, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setToken('');
-    localStorage.removeItem('token');
+    logout();
     navigate('/');
   };
 

@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link, useParams } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const PageList = () => {
-  const { websiteId } = useParams();
   const [pages, setPages] = useState([]);
+  const { websiteId } = useParams();
+  const { token } = useAuth();
 
   useEffect(() => {
-    axios.get(`http://localhost:5001/api/website/${websiteId}/pages`)
-      .then(response => setPages(response.data))
-      .catch(error => console.error('Error fetching pages:', error));
-  }, [websiteId]);
+    const fetchPages = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/website/${websiteId}/pages`, {
+          headers: {
+            'x-auth-token': token
+          }
+        });
+        setPages(response.data);
+      } catch (error) {
+        console.error('Error fetching pages:', error);
+      }
+    };
+
+    fetchPages();
+  }, [websiteId, token]);
 
   return (
     <div>
@@ -22,7 +35,7 @@ const PageList = () => {
           </li>
         ))}
       </ul>
-      <Link to={`/website/${websiteId}/add-page`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      <Link to={`/website/${websiteId}/add-page`} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
         Add Page
       </Link>
     </div>

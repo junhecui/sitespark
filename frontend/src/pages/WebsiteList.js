@@ -1,15 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const WebsiteList = () => {
   const [websites, setWebsites] = useState([]);
+  const { token } = useAuth();
 
   useEffect(() => {
-    axios.get('http://localhost:5001/api/websites')
-      .then(response => setWebsites(response.data))
-      .catch(error => console.error('Error fetching websites:', error));
-  }, []);
+    const fetchWebsites = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/websites', {
+          headers: {
+            'x-auth-token': token
+          }
+        });
+        setWebsites(response.data);
+      } catch (error) {
+        console.error('Error fetching websites:', error);
+      }
+    };
+
+    fetchWebsites();
+  }, [token]);
 
   return (
     <div>
@@ -21,7 +34,7 @@ const WebsiteList = () => {
           </li>
         ))}
       </ul>
-      <Link to="/add-website" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+      <Link to="/add-website" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
         Add Website
       </Link>
     </div>

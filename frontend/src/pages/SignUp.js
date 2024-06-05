@@ -11,7 +11,11 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5001/api/auth/signup', { username, password });
+      const response = await axios.post('http://localhost:5001/api/auth/signup', {
+        username,
+        password,
+      });
+      console.log('User created:', response.data);
       navigate('/login');
     } catch (err) {
       setError(err.response.data.message || 'Error signing up');
