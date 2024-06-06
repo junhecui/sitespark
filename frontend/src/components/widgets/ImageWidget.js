@@ -1,26 +1,10 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 
-const ImageWidget = ({ id, data, onDelete, onUpdate }) => {
-  const [imageUrl, setImageUrl] = useState(data.imageUrl || '');
-
-  const handleImageUpload = async (e) => {
+const ImageWidget = ({ id, data, onDelete, onUpload }) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      try {
-        const response = await axios.post('http://localhost:5001/api/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        setImageUrl(response.data.imageUrl);
-        onUpdate(id, { imageUrl: response.data.imageUrl });
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
+      onUpload(file);
     }
   };
 
@@ -32,10 +16,11 @@ const ImageWidget = ({ id, data, onDelete, onUpdate }) => {
       >
         X
       </button>
-      {imageUrl ? (
-        <img src={imageUrl} alt="Uploaded" className="w-full h-auto" />
+      {data.imageUrl ? (
+        <img src={data.imageUrl} alt="Uploaded" className="w-full h-auto" />
       ) : (
         <div>
+          <p className="text-gray-500">Upload Image:</p>
           <input type="file" onChange={handleImageUpload} className="w-full" />
         </div>
       )}

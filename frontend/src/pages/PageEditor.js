@@ -9,10 +9,12 @@ import TextWidget from '../components/widgets/TextWidget';
 import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
 import Sidebar from '../components/Sidebar';
+import WidgetModal from '../components/WidgetModal';
 
 const PageEditor = () => {
   const { pageId } = useParams();
   const [widgets, setWidgets] = useState([]);
+  const [selectedWidget, setSelectedWidget] = useState(null);
   const { token } = useAuth();
   const boundaryBoxRef = React.createRef();
 
@@ -92,6 +94,7 @@ const PageEditor = () => {
         console.error(`Widget type "${widget.type}" not recognized.`);
         return null;
     }
+
     return (
       <Rnd
         key={widget.id}
@@ -102,8 +105,17 @@ const PageEditor = () => {
         onResizeStop={(e, direction, ref, delta, position) =>
           handleWidgetUpdate(widget.id, widget.data, position, { width: ref.offsetWidth, height: ref.offsetHeight })
         }
+        onClick={() => setSelectedWidget(widget)}
       >
-        <WidgetComponent data={widget.data} id={widget.id} onDelete={() => handleDeleteWidget(widget.id)} onUpdate={handleWidgetUpdate} />
+        <div onMouseDown={(e) => e.stopPropagation()}>
+          <WidgetComponent
+            data={widget.data}
+            id={widget.id}
+            onDelete={() => handleDeleteWidget(widget.id)}
+            onUpdate={handleWidgetUpdate}
+            onUpload={(file) => handleImageUpload(widget.id, file)}
+          />
+        </div>
       </Rnd>
     );
   };
@@ -119,15 +131,55 @@ const PageEditor = () => {
     }
   };
 
+  const handleCloseModal = () => {
+    setSelectedWidget(null);
+  };
+
+  const handleSaveWidget = (id, data) => {
+    const widget = widgets.find(widget => widget.id === id);
+    if (widget) {
+      handleWidgetUpdate(id, data, widget.position, widget.size);
+    }
+  };
+
+  const handleImageUpload = async (id, file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const response = await axios.post('http://localhost:5001/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      const imageUrl = response.data.imageUrl;
+      const widget = widgets.find(widget => widget.id === id);
+      if (widget) {
+        const updatedData = { ...widget.data, imageUrl };
+        handleWidgetUpdate(id, updatedData, widget.position, widget.size);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+
   return (
     <div className="flex">
       <Sidebar onAddWidget={handleAddWidget} />
-      <div className="flex-1 p-4 bg-gray-100 rounded">
+      <div className="flex-1 p-4 bg-gray-100 rounded relative">
         <h1 className="text-2xl font-bold mb-4">Page Editor</h1>
         <div className="boundary-box" ref={boundaryBoxRef} style={{ width: '1200px', height: '800px', border: '2px solid black', position: 'relative', overflow: 'hidden' }}>
           {widgets.map(renderWidget)}
         </div>
       </div>
+      {selectedWidget && (
+        <WidgetModal
+          widget={selectedWidget}
+          isOpen={!!selectedWidget}
+          onClose={handleCloseModal}
+          onSave={handleSaveWidget}
+          onUpload={handleImageUpload}
+        />
+      )}
     </div>
   );
 };
