@@ -1,8 +1,9 @@
+// WidgetModal.js
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import '../index.css';
 
-const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
+const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, onUpload }) => {
   const [data, setData] = useState(widget.data);
 
   useEffect(() => {
@@ -14,6 +15,11 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
     onClose();
   };
 
+  const handleDelete = () => {
+    onDelete(widget.id);
+    onClose();
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setData({ ...data, [name]: value });
@@ -22,7 +28,11 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      onUpload(widget.id, file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setData({ ...data, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -36,7 +46,7 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
       shouldCloseOnOverlayClick={true}
       style={{
         content: {
-          pointerEvents: 'auto'  // Enable pointer events on modal content
+          pointerEvents: 'auto'
         }
       }}
     >
@@ -66,6 +76,12 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Save
+        </button>
+        <button
+          onClick={handleDelete}
+          className="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Delete
         </button>
         <button
           onClick={onClose}

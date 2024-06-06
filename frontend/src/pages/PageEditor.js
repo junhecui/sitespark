@@ -10,6 +10,7 @@ import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
 import Sidebar from '../components/Sidebar';
 import WidgetModal from '../components/WidgetModal';
+import '../index.css';
 
 const PageEditor = () => {
   const { pageId } = useParams();
@@ -110,7 +111,6 @@ const PageEditor = () => {
           <WidgetComponent
             data={widget.data}
             id={widget.id}
-            onDelete={() => handleDeleteWidget(widget.id)}
             onUpdate={handleWidgetUpdate}
             onUpload={(file) => handleImageUpload(widget.id, file)}
           />
@@ -125,6 +125,7 @@ const PageEditor = () => {
         headers: { 'x-auth-token': token }
       });
       setWidgets(widgets.filter(widget => widget.id !== id));
+      setSelectedWidget(null);
     } catch (error) {
       console.error('Error deleting widget:', error);
     }
@@ -176,6 +177,7 @@ const PageEditor = () => {
           isOpen={!!selectedWidget}
           onClose={handleCloseModal}
           onSave={handleSaveWidget}
+          onDelete={handleDeleteWidget}
           onUpload={handleImageUpload}
         />
       )}
