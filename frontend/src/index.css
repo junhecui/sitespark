@@ -26,6 +26,7 @@ code {
   box-shadow: -2px 0 5px rgba(0,0,0,0.3);
   padding: 20px;
   transition: transform 0.3s ease-out;
+  z-index: 1000;
 }
 
 .modal-overlay {
@@ -34,5 +35,7 @@ code {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.3);
+  background-color: transparent;
+  z-index: 999;
+  pointer-events: none;
 }

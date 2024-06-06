@@ -94,7 +94,6 @@ const PageEditor = () => {
         console.error(`Widget type "${widget.type}" not recognized.`);
         return null;
     }
-
     return (
       <Rnd
         key={widget.id}

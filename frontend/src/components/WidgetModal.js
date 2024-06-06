@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
+import '../index.css';
 
 const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
   const [data, setData] = useState(widget.data);
@@ -33,6 +34,11 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onUpload }) => {
       className="modal"
       overlayClassName="modal-overlay"
       shouldCloseOnOverlayClick={true}
+      style={{
+        content: {
+          pointerEvents: 'auto'  // Enable pointer events on modal content
+        }
+      }}
     >
       <h2 className="text-2xl mb-4">Edit Widget</h2>
       {widget.type === 'text' && (
