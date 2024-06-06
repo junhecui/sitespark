@@ -1,9 +1,8 @@
-// WidgetModal.js
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import '../index.css';
 
-const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, onUpload }) => {
+const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
   const [data, setData] = useState(widget.data);
 
   useEffect(() => {
@@ -12,11 +11,6 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, onUpload }) =>
 
   const handleSave = () => {
     onSave(widget.id, data);
-    onClose();
-  };
-
-  const handleDelete = () => {
-    onDelete(widget.id);
     onClose();
   };
 
@@ -43,12 +37,6 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, onUpload }) =>
       contentLabel="Widget Editor"
       className="modal"
       overlayClassName="modal-overlay"
-      shouldCloseOnOverlayClick={true}
-      style={{
-        content: {
-          pointerEvents: 'auto'
-        }
-      }}
     >
       <h2 className="text-2xl mb-4">Edit Widget</h2>
       {widget.type === 'text' && (
@@ -69,7 +57,6 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, onUpload }) =>
           {data.imageUrl && <img src={data.imageUrl} alt="Uploaded" className="w-full h-auto" />}
         </div>
       )}
-      {/* Add similar sections for other widget types if needed */}
       <div className="flex justify-end mt-4">
         <button
           onClick={handleSave}
@@ -78,7 +65,7 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, onUpload }) =>
           Save
         </button>
         <button
-          onClick={handleDelete}
+          onClick={() => onDelete(widget.id)}
           className="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
           Delete

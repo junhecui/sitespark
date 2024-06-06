@@ -9,7 +9,7 @@ const ImageWidget = ({ id, data, onUpload }) => {
   };
 
   return (
-    <div className="image-widget bg-white shadow-md rounded px-4 py-2 mb-4 relative">
+    <div className="image-widget">
       {data.imageUrl ? (
         <img src={data.imageUrl} alt="Uploaded" className="w-full h-auto" />
       ) : (

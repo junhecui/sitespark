@@ -73,7 +73,7 @@ router.post('/login', [
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1000h' });
     res.json({ token });
   } catch (error) {
     console.error('Error logging in:', error);

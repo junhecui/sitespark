@@ -17,16 +17,18 @@ code {
 }
 
 .modal {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
+  position: fixed;
+  top: 50%;
+  left: 75%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
   background-color: white;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
   padding: 20px;
-  transition: transform 0.3s ease-out;
   z-index: 1000;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .modal-overlay {
@@ -37,5 +39,13 @@ code {
   bottom: 0;
   background-color: transparent;
   z-index: 999;
-  pointer-events: none;
+}
+
+.widget-container {
+  display: inline-block;
+}
+
+.widget-content {
+  padding: 0;
+  margin: 0;
 }

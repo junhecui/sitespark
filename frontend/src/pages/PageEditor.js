@@ -106,8 +106,11 @@ const PageEditor = () => {
           handleWidgetUpdate(widget.id, widget.data, position, { width: ref.offsetWidth, height: ref.offsetHeight })
         }
         onClick={() => setSelectedWidget(widget)}
+        disableDragging={!!selectedWidget}
+        enableResizing={!selectedWidget}
+        className="widget-container"
       >
-        <div onMouseDown={(e) => e.stopPropagation()}>
+        <div className="widget-content">
           <WidgetComponent
             data={widget.data}
             id={widget.id}
@@ -178,7 +181,6 @@ const PageEditor = () => {
           onClose={handleCloseModal}
           onSave={handleSaveWidget}
           onDelete={handleDeleteWidget}
-          onUpload={handleImageUpload}
         />
       )}
     </div>
