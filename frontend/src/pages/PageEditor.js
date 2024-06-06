@@ -89,21 +89,27 @@ function PageEditor() {
 
   const handleDragStop = async (e, d, id) => {
     const newPosition = { x: d.x, y: d.y };
-    try {
-      await axiosInstance.put(`/widget/${id}`, { position: newPosition });
-      fetchWidgets();
-    } catch (error) {
-      console.error('Error updating widget position:', error);
+    const widget = widgets.find(w => w.id === id);
+    if (widget) {
+      try {
+        await axiosInstance.put(`/widget/${id}`, { data: widget.data, position: newPosition, size: widget.size });
+        fetchWidgets();
+      } catch (error) {
+        console.error('Error updating widget position:', error);
+      }
     }
   };
 
   const handleResizeStop = async (e, direction, ref, delta, position, id) => {
     const newSize = { width: ref.style.width, height: ref.style.height };
-    try {
-      await axiosInstance.put(`/widget/${id}`, { size: newSize, position });
-      fetchWidgets();
-    } catch (error) {
-      console.error('Error updating widget size:', error);
+    const widget = widgets.find(w => w.id === id);
+    if (widget) {
+      try {
+        await axiosInstance.put(`/widget/${id}`, { data: widget.data, size: newSize, position });
+        fetchWidgets();
+      } catch (error) {
+        console.error('Error updating widget size:', error);
+      }
     }
   };
 

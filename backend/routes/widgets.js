@@ -16,10 +16,12 @@ router.post('/page/:pageId/widget', authenticateJWT, async (req, res) => {
   const userId = req.user.id;
 
   try {
-    console.log("Creating widget with data:", { pageId, type, data, position, size, userId });
+    const parsedData = JSON.stringify(data);
+    const parsedPosition = JSON.stringify(position);
+    const parsedSize = JSON.stringify(size);
     const result = await session.run(
       'MATCH (p:Page {id: $pageId, userId: $userId}) CREATE (w:Widget {id: $id, type: $type, data: $data, position: $position, size: $size, userId: $userId})-[:BELONGS_TO]->(p) RETURN w',
-      { pageId, id: uuidv4(), type, data: JSON.stringify(data), position: JSON.stringify(position), size: JSON.stringify(size), userId }
+      { pageId, id: uuidv4(), type, data: parsedData, position: parsedPosition, size: parsedSize, userId }
     );
     const widget = result.records[0].get('w').properties;
     res.status(201).json(widget);
@@ -36,10 +38,12 @@ router.put('/widget/:id', authenticateJWT, async (req, res) => {
   const userId = req.user.id;
 
   try {
-    console.log("Updating widget with data:", { id, data, position, size, userId });
+    const parsedData = JSON.stringify(data);
+    const parsedPosition = JSON.stringify(position);
+    const parsedSize = JSON.stringify(size);
     const result = await session.run(
       'MATCH (w:Widget {id: $id, userId: $userId}) SET w.data = $data, w.position = $position, w.size = $size RETURN w',
-      { id, data: JSON.stringify(data), position: JSON.stringify(position), size: JSON.stringify(size), userId }
+      { id, data: parsedData, position: parsedPosition, size: parsedSize, userId }
     );
     const widget = result.records[0].get('w').properties;
     res.status(200).json(widget);
@@ -55,7 +59,6 @@ router.get('/page/:pageId/widgets', authenticateJWT, async (req, res) => {
   const userId = req.user.id;
 
   try {
-    console.log(`Fetching widgets for page: ${pageId}`);
     const result = await session.run(
       'MATCH (w:Widget)-[:BELONGS_TO]->(p:Page {id: $pageId, userId: $userId}) RETURN w',
       { pageId, userId }
@@ -67,7 +70,6 @@ router.get('/page/:pageId/widgets', authenticateJWT, async (req, res) => {
       widget.size = JSON.parse(widget.size);
       return widget;
     });
-    console.log("Fetched widgets: ", widgets);
     res.status(200).json(widgets);
   } catch (error) {
     console.error('Error fetching widgets:', error);
