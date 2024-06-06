@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { session } = require('../db/neo4j');
+const { driver } = require('../db/neo4j');
 const upload = require('../middlewares/upload');
 const { authenticateJWT } = require('./auth');
 
@@ -15,19 +15,19 @@ router.post('/page/:pageId/widget', authenticateJWT, async (req, res) => {
   const { type, data, position = { x: 0, y: 0 }, size = { width: 200, height: 200 } } = req.body;
   const userId = req.user.id;
 
+  const session = driver.session();
   try {
-    const parsedData = JSON.stringify(data);
-    const parsedPosition = JSON.stringify(position);
-    const parsedSize = JSON.stringify(size);
     const result = await session.run(
       'MATCH (p:Page {id: $pageId, userId: $userId}) CREATE (w:Widget {id: $id, type: $type, data: $data, position: $position, size: $size, userId: $userId})-[:BELONGS_TO]->(p) RETURN w',
-      { pageId, id: uuidv4(), type, data: parsedData, position: parsedPosition, size: parsedSize, userId }
+      { pageId, id: uuidv4(), type, data: JSON.stringify(data), position: JSON.stringify(position), size: JSON.stringify(size), userId }
     );
     const widget = result.records[0].get('w').properties;
     res.status(201).json(widget);
   } catch (error) {
     console.error('Error creating widget:', error);
     res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await session.close();
   }
 });
 
@@ -37,19 +37,19 @@ router.put('/widget/:id', authenticateJWT, async (req, res) => {
   const { data, position = { x: 0, y: 0 }, size = { width: 200, height: 200 } } = req.body;
   const userId = req.user.id;
 
+  const session = driver.session();
   try {
-    const parsedData = JSON.stringify(data);
-    const parsedPosition = JSON.stringify(position);
-    const parsedSize = JSON.stringify(size);
     const result = await session.run(
       'MATCH (w:Widget {id: $id, userId: $userId}) SET w.data = $data, w.position = $position, w.size = $size RETURN w',
-      { id, data: parsedData, position: parsedPosition, size: parsedSize, userId }
+      { id, data: JSON.stringify(data), position: JSON.stringify(position), size: JSON.stringify(size), userId }
     );
     const widget = result.records[0].get('w').properties;
     res.status(200).json(widget);
   } catch (error) {
     console.error('Error updating widget:', error);
     res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await session.close();
   }
 });
 
@@ -58,6 +58,7 @@ router.get('/page/:pageId/widgets', authenticateJWT, async (req, res) => {
   const { pageId } = req.params;
   const userId = req.user.id;
 
+  const session = driver.session();
   try {
     const result = await session.run(
       'MATCH (w:Widget)-[:BELONGS_TO]->(p:Page {id: $pageId, userId: $userId}) RETURN w',
@@ -74,6 +75,8 @@ router.get('/page/:pageId/widgets', authenticateJWT, async (req, res) => {
   } catch (error) {
     console.error('Error fetching widgets:', error);
     res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await session.close();
   }
 });
 
@@ -82,6 +85,7 @@ router.delete('/widget/:id', authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
 
+  const session = driver.session();
   try {
     await session.run(
       'MATCH (w:Widget {id: $id, userId: $userId}) DETACH DELETE w',
@@ -91,6 +95,8 @@ router.delete('/widget/:id', authenticateJWT, async (req, res) => {
   } catch (error) {
     console.error('Error deleting widget:', error);
     res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await session.close();
   }
 });
 
@@ -99,6 +105,7 @@ router.delete('/widgets', authenticateJWT, async (req, res) => {
   const { pageId } = req.query;
   const userId = req.user.id;
 
+  const session = driver.session();
   try {
     await session.run(
       'MATCH (w:Widget)-[:BELONGS_TO]->(p:Page {id: $pageId, userId: $userId}) DETACH DELETE w',
@@ -108,6 +115,8 @@ router.delete('/widgets', authenticateJWT, async (req, res) => {
   } catch (error) {
     console.error('Error deleting widgets:', error);
     res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await session.close();
   }
 });
 

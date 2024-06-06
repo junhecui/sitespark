@@ -10,48 +10,23 @@ import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
 import Sidebar from '../components/Sidebar';
 
-const componentsMap = {
-  form: FormWidget,
-  chart: ChartWidget,
-  text: TextWidget,
-  image: ImageWidget,
-  button: ButtonWidget,
-};
-
-function PageEditor() {
+const PageEditor = () => {
   const { pageId } = useParams();
-  const { token } = useAuth();
   const [widgets, setWidgets] = useState([]);
-  const [availableWidgets] = useState([
-    { id: '1', name: 'Chart Widget', type: 'chart' },
-    { id: '2', name: 'Form Widget', type: 'form' },
-    { id: '3', name: 'Text Widget', type: 'text' },
-    { id: '4', name: 'Image Widget', type: 'image' },
-    { id: '5', name: 'Button Widget', type: 'button' },
-  ]);
-
-  const axiosInstance = axios.create({
-    baseURL: 'http://localhost:5001/api',
-    headers: {
-      'x-auth-token': token,
-    },
-  });
+  const { token } = useAuth();
+  const boundaryBoxRef = React.createRef();
 
   const fetchWidgets = useCallback(async () => {
     try {
-      console.log(`Fetching widgets for page: ${pageId}`);
-      const response = await axiosInstance.get(`/page/${pageId}/widgets`);
-      console.log("Widgets fetched: ", response.data);
-
-      const fetchedWidgets = response.data.map((widget) => {
-        console.log(`Processing widget: ${widget.id}`);
-        return {
-          ...widget,
-          position: typeof widget.position === 'string' ? JSON.parse(widget.position) : widget.position,
-          size: typeof widget.size === 'string' ? JSON.parse(widget.size) : widget.size,
-          type: widget.type.replace(/\"/g, ''), // Clean up type value
-        };
+      const response = await axios.get(`http://localhost:5001/api/page/${pageId}/widgets`, {
+        headers: { 'x-auth-token': token }
       });
+      const fetchedWidgets = response.data.map(widget => ({
+        ...widget,
+        data: typeof widget.data === 'string' ? JSON.parse(widget.data) : widget.data,
+        position: typeof widget.position === 'string' ? JSON.parse(widget.position) : widget.position,
+        size: typeof widget.size === 'string' ? JSON.parse(widget.size) : widget.size
+      }));
       setWidgets(fetchedWidgets);
     } catch (error) {
       console.error('Error fetching widgets:', error);
@@ -62,102 +37,99 @@ function PageEditor() {
     fetchWidgets();
   }, [fetchWidgets]);
 
-  const handleDelete = useCallback(async (id) => {
+  const handleWidgetUpdate = useCallback(async (id, data, position, size) => {
     try {
-      await axiosInstance.delete(`/widget/${id}`);
+      await axios.put(`http://localhost:5001/api/widget/${id}`, {
+        data: JSON.stringify(data),
+        position: JSON.stringify(position),
+        size: JSON.stringify(size)
+      }, {
+        headers: { 'x-auth-token': token }
+      });
       fetchWidgets();
     } catch (error) {
-      console.error('Error deleting widget:', error);
+      console.error('Error updating widget:', error);
     }
-  }, [fetchWidgets]);
+  }, [fetchWidgets, token]);
 
   const handleAddWidget = async (widgetType) => {
     try {
-      const widget = {
+      const newWidget = {
         pageId,
         type: widgetType,
         data: {},
         position: { x: 0, y: 0 },
-        size: { width: 200, height: 200 },
+        size: { width: 200, height: 200 }
       };
-      await axiosInstance.post(`/page/${pageId}/widget`, widget);
-      fetchWidgets();
+      const response = await axios.post(`http://localhost:5001/api/page/${pageId}/widget`, newWidget, {
+        headers: { 'x-auth-token': token }
+      });
+      setWidgets([...widgets, response.data]);
     } catch (error) {
       console.error('Error creating widget:', error);
     }
   };
 
-  const handleDragStop = async (e, d, id) => {
-    const newPosition = { x: d.x, y: d.y };
-    const widget = widgets.find(w => w.id === id);
-    if (widget) {
-      try {
-        await axiosInstance.put(`/widget/${id}`, { data: widget.data, position: newPosition, size: widget.size });
-        fetchWidgets();
-      } catch (error) {
-        console.error('Error updating widget position:', error);
-      }
+  const renderWidget = (widget) => {
+    let WidgetComponent;
+    switch (widget.type) {
+      case 'form':
+        WidgetComponent = FormWidget;
+        break;
+      case 'chart':
+        WidgetComponent = ChartWidget;
+        break;
+      case 'text':
+        WidgetComponent = TextWidget;
+        break;
+      case 'image':
+        WidgetComponent = ImageWidget;
+        break;
+      case 'button':
+        WidgetComponent = ButtonWidget;
+        break;
+      default:
+        console.error(`Widget type "${widget.type}" not recognized.`);
+        return null;
     }
+    return (
+      <Rnd
+        key={widget.id}
+        bounds=".boundary-box"
+        size={{ width: widget.size.width, height: widget.size.height }}
+        position={{ x: widget.position.x, y: widget.position.y }}
+        onDragStop={(e, d) => handleWidgetUpdate(widget.id, widget.data, { x: d.x, y: d.y }, widget.size)}
+        onResizeStop={(e, direction, ref, delta, position) =>
+          handleWidgetUpdate(widget.id, widget.data, position, { width: ref.offsetWidth, height: ref.offsetHeight })
+        }
+      >
+        <WidgetComponent data={widget.data} id={widget.id} onDelete={() => handleDeleteWidget(widget.id)} onUpdate={handleWidgetUpdate} />
+      </Rnd>
+    );
   };
 
-  const handleResizeStop = async (e, direction, ref, delta, position, id) => {
-    const newSize = { width: ref.style.width, height: ref.style.height };
-    const widget = widgets.find(w => w.id === id);
-    if (widget) {
-      try {
-        await axiosInstance.put(`/widget/${id}`, { data: widget.data, size: newSize, position });
-        fetchWidgets();
-      } catch (error) {
-        console.error('Error updating widget size:', error);
-      }
+  const handleDeleteWidget = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5001/api/widget/${id}`, {
+        headers: { 'x-auth-token': token }
+      });
+      setWidgets(widgets.filter(widget => widget.id !== id));
+    } catch (error) {
+      console.error('Error deleting widget:', error);
     }
   };
 
   return (
-    <div className="flex h-screen">
-      <Sidebar
-        widgets={availableWidgets}
-        onAddWidget={(widgetType) => handleAddWidget(widgetType.type)}
-      />
+    <div className="flex">
+      <Sidebar onAddWidget={handleAddWidget} />
       <div className="flex-1 p-4 bg-gray-100 rounded">
         <h1 className="text-2xl font-bold mb-4">Page Editor</h1>
-        <div className="relative w-full h-full">
-          {widgets.map((widget) => {
-            const WidgetComponent = componentsMap[widget.type];
-            if (!WidgetComponent) {
-              console.error(`Widget type "${widget.type}" not recognized.`);
-              return null;
-            }
-            return (
-              <Rnd
-                key={widget.id}
-                default={{
-                  x: widget.position.x,
-                  y: widget.position.y,
-                  width: widget.size.width,
-                  height: widget.size.height,
-                }}
-                onDragStop={(e, d) => handleDragStop(e, d, widget.id)}
-                onResizeStop={(e, direction, ref, delta, position) =>
-                  handleResizeStop(e, direction, ref, delta, position, widget.id)
-                }
-              >
-                <div className="bg-white shadow-md rounded p-2 mb-2 relative">
-                  <button
-                    onClick={() => handleDelete(widget.id)}
-                    className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                  >
-                    X
-                  </button>
-                  <WidgetComponent id={widget.id} data={widget.data} onDelete={handleDelete} />
-                </div>
-              </Rnd>
-            );
-          })}
+        <div className="boundary-box" ref={boundaryBoxRef} style={{ width: '1200px', height: '800px', border: '2px solid black', position: 'relative', overflow: 'hidden' }}>
+          {widgets.map(renderWidget)}
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default PageEditor;

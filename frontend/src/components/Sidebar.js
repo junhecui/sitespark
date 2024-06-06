@@ -1,20 +1,20 @@
 import React from 'react';
 
-const Sidebar = ({ widgets, onAddWidget }) => {
+const Sidebar = ({ onAddWidget }) => {
+  const widgetTypes = ['form', 'chart', 'text', 'image', 'button'];
+
   return (
-    <div className="w-1/4 bg-gray-200 p-4">
-      <h2 className="font-bold text-lg mb-4">Widgets</h2>
-      <div>
-        {widgets.map((widget, index) => (
-          <div
-            key={widget.id}
-            className="p-2 mb-2 bg-white border rounded cursor-pointer"
-            onClick={() => onAddWidget(widget)}
-          >
-            {widget.name}
-          </div>
-        ))}
-      </div>
+    <div className="w-48 p-4 bg-gray-800 text-white">
+      <h2 className="text-xl font-bold mb-4">Add Widget</h2>
+      {widgetTypes.map(type => (
+        <button
+          key={type}
+          onClick={() => onAddWidget(type)}
+          className="block w-full text-left mb-2 p-2 bg-blue-500 hover:bg-blue-700 rounded"
+        >
+          {type.charAt(0).toUpperCase() + type.slice(1)} Widget
+        </button>
+      ))}
     </div>
   );
 };

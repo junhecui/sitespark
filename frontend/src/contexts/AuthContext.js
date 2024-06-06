@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const saveToken = (userToken) => {
     localStorage.setItem('token', userToken);
     setToken(userToken);
-  };
+  };  
 
   const logout = () => {
     localStorage.removeItem('token');
