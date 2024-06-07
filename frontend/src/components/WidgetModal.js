@@ -46,8 +46,36 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
             name="text"
             value={data.text || ''}
             onChange={handleInputChange}
-            className="w-full border rounded px-2 py-1"
+            className="w-full border rounded px-2 py-1 mb-2"
           />
+          <label className="block text-sm font-bold mb-2">Font Size:</label>
+          <input
+            type="number"
+            name="fontSize"
+            value={data.fontSize || 16}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          />
+          <label className="block text-sm font-bold mb-2">Font Family:</label>
+          <input
+            type="text"
+            name="fontFamily"
+            value={data.fontFamily || 'Arial, sans-serif'}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          />
+          <label className="block text-sm font-bold mb-2">Text Align:</label>
+          <select
+            name="textAlign"
+            value={data.textAlign || 'left'}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          >
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+            <option value="justify">Justify</option>
+          </select>
         </div>
       )}
       {widget.type === 'image' && (
@@ -65,7 +93,10 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
           Save
         </button>
         <button
-          onClick={() => onDelete(widget.id)}
+          onClick={() => {
+            onDelete(widget.id);
+            onClose();
+          }}
           className="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
           Delete
