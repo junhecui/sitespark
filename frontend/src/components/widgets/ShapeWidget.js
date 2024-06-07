@@ -1,18 +1,23 @@
 import React from 'react';
 
 const ShapeWidget = ({ id, data }) => {
-  const { shape, width, height, color, opacity } = data;
-  const style = {
-    width: width || 100,
-    height: height || 100,
-    backgroundColor: color || '#000000',
-    opacity: opacity !== undefined ? opacity : 1,
-    borderRadius: shape === 'circle' ? '50%' : '0'
+  const shapeStyle = {
+    width: `${data.width || 100}px`,
+    height: `${data.height || 100}px`,
+    backgroundColor: data.color || '#000000',
+    opacity: data.opacity !== undefined ? data.opacity : 1,
+    borderRadius: data.shape === 'circle' ? '50%' : '0'
   };
 
-  return (
-    <div className="shape-widget" style={style}></div>
-  );
+  if (data.clickable && data.link) {
+    return (
+      <a href={data.link} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
+        <div style={shapeStyle}></div>
+      </a>
+    );
+  }
+
+  return <div style={shapeStyle}></div>;
 };
 
 export default ShapeWidget;

@@ -179,6 +179,28 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
           />
         </div>
       )}
+      <div className="flex items-center mb-2">
+        <input
+          type="checkbox"
+          name="clickable"
+          checked={data.clickable || false}
+          onChange={handleInputChange}
+          className="mr-2"
+        />
+        <label className="block text-sm font-bold">Clickable</label>
+      </div>
+      {data.clickable && (
+        <div>
+          <label className="block text-sm font-bold mb-2">Link:</label>
+          <input
+            type="text"
+            name="link"
+            value={data.link || ''}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          />
+        </div>
+      )}
       <div className="flex justify-end mt-4">
         <button
           onClick={handleSave}
