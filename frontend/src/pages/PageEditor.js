@@ -8,6 +8,7 @@ import ChartWidget from '../components/widgets/ChartWidget';
 import TextWidget from '../components/widgets/TextWidget';
 import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
+import ShapeWidget from '../components/widgets/ShapeWidget'; // Import ShapeWidget
 import Sidebar from '../components/Sidebar';
 import WidgetModal from '../components/WidgetModal';
 import '../index.css';
@@ -90,6 +91,9 @@ const PageEditor = () => {
         break;
       case 'button':
         WidgetComponent = ButtonWidget;
+        break;
+      case 'shape':
+        WidgetComponent = ShapeWidget; // Add case for ShapeWidget
         break;
       default:
         console.error(`Widget type "${widget.type}" not recognized.`);

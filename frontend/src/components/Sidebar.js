@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Sidebar = ({ onAddWidget }) => {
-  const widgetTypes = ['form', 'chart', 'text', 'image', 'button'];
+  const widgetTypes = ['form', 'chart', 'text', 'image', 'button', 'shape'];
 
   return (
     <div className="w-48 p-4 bg-gray-800 text-white">

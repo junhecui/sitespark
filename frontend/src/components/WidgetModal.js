@@ -130,6 +130,55 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
           {data.imageUrl && <img src={data.imageUrl} alt="Uploaded" className="w-full h-auto" />}
         </div>
       )}
+      {widget.type === 'shape' && (
+        <div>
+          <label className="block text-sm font-bold mb-2">Shape:</label>
+          <select
+            name="shape"
+            value={data.shape || 'rectangle'}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          >
+            <option value="rectangle">Rectangle</option>
+            <option value="circle">Circle</option>
+          </select>
+          <label className="block text-sm font-bold mb-2">Width:</label>
+          <input
+            type="number"
+            name="width"
+            value={data.width || 100}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          />
+          <label className="block text-sm font-bold mb-2">Height:</label>
+          <input
+            type="number"
+            name="height"
+            value={data.height || 100}
+            onChange={handleInputChange}
+            className="w-full border rounded px-2 py-1 mb-2"
+          />
+          <label className="block text-sm font-bold mb-2">Color:</label>
+          <input
+            type="color"
+            name="color"
+            value={data.color || '#000000'}
+            onChange={handleInputChange}
+            className="w-full mb-2"
+          />
+          <label className="block text-sm font-bold mb-2">Opacity:</label>
+          <input
+            type="range"
+            name="opacity"
+            min="0"
+            max="1"
+            step="0.01"
+            value={data.opacity !== undefined ? data.opacity : 1}
+            onChange={handleInputChange}
+            className="w-full mb-2"
+          />
+        </div>
+      )}
       <div className="flex justify-end mt-4">
         <button
           onClick={handleSave}
