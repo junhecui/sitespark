@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
 import '../index.css';
 
+const availableFonts = [
+  'Arial, sans-serif',
+  'Helvetica, sans-serif',
+  'Times New Roman, serif',
+  'Georgia, serif',
+  'Courier New, monospace',
+  'Verdana, sans-serif',
+  'Tahoma, sans-serif',
+  'Trebuchet MS, sans-serif',
+  'Lucida Console, monospace'
+];
+
 const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
   const [data, setData] = useState(widget.data);
 
@@ -15,8 +27,8 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setData({ ...data, [name]: value });
+    const { name, value, type, checked } = e.target;
+    setData({ ...data, [name]: type === 'checkbox' ? checked : value });
   };
 
   const handleImageUpload = (e) => {
@@ -57,13 +69,46 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
             className="w-full border rounded px-2 py-1 mb-2"
           />
           <label className="block text-sm font-bold mb-2">Font Family:</label>
-          <input
-            type="text"
+          <select
             name="fontFamily"
             value={data.fontFamily || 'Arial, sans-serif'}
             onChange={handleInputChange}
             className="w-full border rounded px-2 py-1 mb-2"
+          >
+            {availableFonts.map((font, index) => (
+              <option key={index} value={font} style={{ fontFamily: font }}>
+                {font.split(',')[0]}
+              </option>
+            ))}
+          </select>
+          <label className="block text-sm font-bold mb-2">Font Color:</label>
+          <input
+            type="color"
+            name="fontColor"
+            value={data.fontColor || '#000000'}
+            onChange={handleInputChange}
+            className="w-full mb-2"
           />
+          <div className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              name="bold"
+              checked={data.bold || false}
+              onChange={handleInputChange}
+              className="mr-2"
+            />
+            <label className="block text-sm font-bold">Bold</label>
+          </div>
+          <div className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              name="italic"
+              checked={data.italic || false}
+              onChange={handleInputChange}
+              className="mr-2"
+            />
+            <label className="block text-sm font-bold">Italic</label>
+          </div>
           <label className="block text-sm font-bold mb-2">Text Align:</label>
           <select
             name="textAlign"
