@@ -31,7 +31,6 @@ const PageEditor = () => {
       setWebsiteId(response.data.websiteId);
     } catch (error) {
       console.error('Error fetching website ID:', error);
-      console.log(`Error response: ${error.response ? JSON.stringify(error.response.data) : 'No response data'}`);
     }
   }, [pageId, token]);
 
@@ -57,8 +56,10 @@ const PageEditor = () => {
   }, [pageId, token]);
 
   useEffect(() => {
-    fetchWidgets();
-  }, [fetchWidgets]);
+    if (websiteId) {
+      fetchWidgets();
+    }
+  }, [websiteId, fetchWidgets]);
 
   const handleWidgetUpdate = useCallback(async (id, data, position, size) => {
     try {

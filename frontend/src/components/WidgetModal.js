@@ -21,15 +21,13 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
   const [linkType, setLinkType] = useState(data.pageLink ? 'page' : 'custom');
 
   const fetchPages = useCallback(async () => {
+    if (!widget.websiteId) {
+      console.log('No website ID found for widget:', widget);
+      return;
+    }
     try {
-      console.log(`Fetching website ID for widget: ${widget.id}`);
-      const response = await axios.get(`http://localhost:5001/api/page/${widget.id}/website`, {
-        headers: { 'x-auth-token': token }
-      });
-      const websiteId = response.data.websiteId;
-      console.log(`Fetching pages for website: ${websiteId}`);
-
-      const pagesResponse = await axios.get(`http://localhost:5001/api/website/${websiteId}/pages`, {
+      console.log(`Fetching pages for website: ${widget.websiteId}`);
+      const pagesResponse = await axios.get(`http://localhost:5001/api/website/${widget.websiteId}/pages`, {
         headers: { 'x-auth-token': token }
       });
       console.log('Pages fetched:', pagesResponse.data);
@@ -37,7 +35,7 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
     } catch (error) {
       console.error('Error fetching pages:', error);
     }
-  }, [widget.id, token]);
+  }, [widget.websiteId, token]);
 
   useEffect(() => {
     setData(widget.data);

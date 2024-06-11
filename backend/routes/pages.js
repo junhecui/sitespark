@@ -43,15 +43,14 @@ router.delete('/pages/:id', async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error('Error deleting page:', error);
-    res.status500.json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
 // Route to get websiteId by pageId
 router.get('/page/:pageId/website', async (req, res) => {
   const { pageId } = req.params;
-
-  console.log(`Received request to fetch website ID for page: ${pageId}`); // Logging request
+  console.log(`Fetching website ID for page: ${pageId}`);
 
   try {
     const result = await session.run(
@@ -60,12 +59,11 @@ router.get('/page/:pageId/website', async (req, res) => {
     );
 
     if (result.records.length === 0) {
-      console.log('No website found for this page'); // Logging response
       return res.status(404).json({ message: 'Website not found for this page' });
     }
 
     const websiteId = result.records[0].get('websiteId');
-    console.log(`Fetched website ID: ${websiteId}`); // Logging response
+    console.log(`Found website ID: ${websiteId}`);
     res.status(200).json({ websiteId });
   } catch (error) {
     console.error('Error fetching website ID:', error);
