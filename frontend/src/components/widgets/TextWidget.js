@@ -4,7 +4,7 @@ const TextWidget = ({ id, data }) => {
   const content = (
     <p
       style={{
-        fontSize: data.fontSize || 16,
+        fontSize: `${data.fontSize || 16}px`,
         fontFamily: data.fontFamily || 'Arial, sans-serif',
         color: data.fontColor || '#000000',
         fontWeight: data.bold ? 'bold' : 'normal',
@@ -16,9 +16,10 @@ const TextWidget = ({ id, data }) => {
     </p>
   );
 
-  if (data.clickable && data.link) {
+  if (data.clickable) {
+    const link = data.pageLink ? `/page/${data.pageLink}` : data.link;
     return (
-      <a href={data.link} target="_blank" rel="noopener noreferrer">
+      <a href={link} target="_blank" rel="noopener noreferrer">
         {content}
       </a>
     );

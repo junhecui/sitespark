@@ -9,9 +9,10 @@ const ShapeWidget = ({ id, data }) => {
     borderRadius: data.shape === 'circle' ? '50%' : '0'
   };
 
-  if (data.clickable && data.link) {
+  if (data.clickable) {
+    const link = data.pageLink ? `/page/${data.pageLink}` : data.link;
     return (
-      <a href={data.link} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
+      <a href={link} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
         <div style={shapeStyle}></div>
       </a>
     );

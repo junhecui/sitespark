@@ -9,9 +9,10 @@ const ImageWidget = ({ id, data }) => {
     </div>
   );
 
-  if (data.clickable && data.link) {
+  if (data.clickable) {
+    const link = data.pageLink ? `/page/${data.pageLink}` : data.link;
     return (
-      <a href={data.link} target="_blank" rel="noopener noreferrer">
+      <a href={link} target="_blank" rel="noopener noreferrer">
         {content}
       </a>
     );

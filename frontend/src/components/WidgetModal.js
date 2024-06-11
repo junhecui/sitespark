@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Modal from 'react-modal';
+import axios from 'axios';
 import '../index.css';
 
 const availableFonts = [
@@ -14,12 +15,34 @@ const availableFonts = [
   'Lucida Console, monospace'
 ];
 
-const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
+const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
   const [data, setData] = useState(widget.data);
+  const [pages, setPages] = useState([]);
+  const [linkType, setLinkType] = useState(data.pageLink ? 'page' : 'custom');
+
+  const fetchPages = useCallback(async () => {
+    try {
+      console.log(`Fetching website ID for widget: ${widget.id}`);
+      const response = await axios.get(`http://localhost:5001/api/page/${widget.id}/website`, {
+        headers: { 'x-auth-token': token }
+      });
+      const websiteId = response.data.websiteId;
+      console.log(`Fetching pages for website: ${websiteId}`);
+
+      const pagesResponse = await axios.get(`http://localhost:5001/api/website/${websiteId}/pages`, {
+        headers: { 'x-auth-token': token }
+      });
+      console.log('Pages fetched:', pagesResponse.data);
+      setPages(pagesResponse.data);
+    } catch (error) {
+      console.error('Error fetching pages:', error);
+    }
+  }, [widget.id, token]);
 
   useEffect(() => {
     setData(widget.data);
-  }, [widget]);
+    fetchPages();
+  }, [widget, fetchPages]);
 
   const handleSave = () => {
     onSave(widget.id, data);
@@ -191,14 +214,44 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
       </div>
       {data.clickable && (
         <div>
-          <label className="block text-sm font-bold mb-2">Link:</label>
-          <input
-            type="text"
-            name="link"
-            value={data.link || ''}
-            onChange={handleInputChange}
+          <label className="block text-sm font-bold mb-2">Link Type:</label>
+          <select
+            value={linkType}
+            onChange={(e) => setLinkType(e.target.value)}
             className="w-full border rounded px-2 py-1 mb-2"
-          />
+          >
+            <option value="custom">Custom Link</option>
+            <option value="page">Link to Page</option>
+          </select>
+          {linkType === 'custom' ? (
+            <div>
+              <label className="block text-sm font-bold mb-2">Link:</label>
+              <input
+                type="text"
+                name="link"
+                value={data.link || ''}
+                onChange={handleInputChange}
+                className="w-full border rounded px-2 py-1 mb-2"
+              />
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-bold mb-2">Select Page:</label>
+              <select
+                name="pageLink"
+                value={data.pageLink || ''}
+                onChange={handleInputChange}
+                className="w-full border rounded px-2 py-1 mb-2"
+              >
+                <option value="">Select Page</option>
+                {pages.map((page) => (
+                  <option key={page.id} value={page.id}>
+                    {page.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
       )}
       <div className="flex justify-end mt-4">
@@ -209,6 +262,12 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
           Save
         </button>
         <button
+          onClick={onClose}
+          className="ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+        <button
           onClick={() => {
             onDelete(widget.id);
             onClose();
@@ -216,12 +275,6 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete }) => {
           className="ml-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
           Delete
-        </button>
-        <button
-          onClick={onClose}
-          className="ml-2 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Cancel
         </button>
       </div>
     </Modal>

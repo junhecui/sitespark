@@ -8,7 +8,7 @@ import ChartWidget from '../components/widgets/ChartWidget';
 import TextWidget from '../components/widgets/TextWidget';
 import ImageWidget from '../components/widgets/ImageWidget';
 import ButtonWidget from '../components/widgets/ButtonWidget';
-import ShapeWidget from '../components/widgets/ShapeWidget'; // Import ShapeWidget
+import ShapeWidget from '../components/widgets/ShapeWidget';
 import Sidebar from '../components/Sidebar';
 import WidgetModal from '../components/WidgetModal';
 import '../index.css';
@@ -17,8 +17,27 @@ const PageEditor = () => {
   const { pageId } = useParams();
   const [widgets, setWidgets] = useState([]);
   const [selectedWidget, setSelectedWidget] = useState(null);
+  const [websiteId, setWebsiteId] = useState(null);
   const { token } = useAuth();
   const boundaryBoxRef = React.createRef();
+
+  const fetchWebsiteId = useCallback(async () => {
+    try {
+      console.log(`Fetching website ID for page: "${pageId}"`);
+      const response = await axios.get(`http://localhost:5001/api/page/${pageId}/website`, {
+        headers: { 'x-auth-token': token }
+      });
+      console.log(`Fetched website ID: ${response.data.websiteId}`);
+      setWebsiteId(response.data.websiteId);
+    } catch (error) {
+      console.error('Error fetching website ID:', error);
+      console.log(`Error response: ${error.response ? JSON.stringify(error.response.data) : 'No response data'}`);
+    }
+  }, [pageId, token]);
+
+  useEffect(() => {
+    fetchWebsiteId();
+  }, [fetchWebsiteId]);
 
   const fetchWidgets = useCallback(async () => {
     try {
@@ -93,7 +112,7 @@ const PageEditor = () => {
         WidgetComponent = ButtonWidget;
         break;
       case 'shape':
-        WidgetComponent = ShapeWidget; // Add case for ShapeWidget
+        WidgetComponent = ShapeWidget;
         break;
       default:
         console.error(`Widget type "${widget.type}" not recognized.`);
@@ -180,11 +199,12 @@ const PageEditor = () => {
       </div>
       {selectedWidget && (
         <WidgetModal
-          widget={selectedWidget}
+          widget={{ ...selectedWidget, websiteId }}
           isOpen={!!selectedWidget}
           onClose={handleCloseModal}
           onSave={handleSaveWidget}
           onDelete={handleDeleteWidget}
+          token={token}
         />
       )}
     </div>

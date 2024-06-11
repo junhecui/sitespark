@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { AuthProvider } from './contexts/AuthContext';
-import './index.css'
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 
 ReactDOM.render(
-  <AuthProvider>
+  <React.StrictMode>
     <App />
-  </AuthProvider>,
+  </React.StrictMode>,
   document.getElementById('root')
 );
