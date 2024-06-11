@@ -1,6 +1,18 @@
 # SiteSpark
 
-SiteSpark is an introductory, user-friendly web application that will allow interested or aspiring website builders to get a feel for designing web pages.
+SiteSpark is an introductory[^1], user-friendly web application that will allow interested or aspiring website builders to get a feel for designing web pages. It has basic and clear features and buttons to allow beginners to create and host their first website!
+
+[^1]: *SiteSpark is NOT a robust low code website builder, and it is advised that users look into other platforms if they wish to build a website for commercial use.*
+
+## Features
+
+### Website Creation
+
+SiteSpark enables users to natively launch their designed website for others to view. Using a basic username-password system, SiteSpark users can make private websites that they can publicly display after completion, as well as provide live updates.
+
+### Widget Creation
+
+SiteSpark has a variety of widgets, including text, shapes, images, and charts. These widgets are customizable and users can create hyperlinks for other pages in their website.
 
 ## Technologies Used
 
