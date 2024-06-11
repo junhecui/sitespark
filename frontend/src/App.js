@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+import FullWebsite from './pages/FullWebsite';
 import PageEditor from './pages/PageEditor';
 import WebsiteList from './pages/WebsiteList';
 import AddWebsite from './pages/AddWebsite';
