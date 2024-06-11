@@ -56,10 +56,8 @@ const PageEditor = () => {
   }, [pageId, token]);
 
   useEffect(() => {
-    if (websiteId) {
-      fetchWidgets();
-    }
-  }, [websiteId, fetchWidgets]);
+    fetchWidgets();
+  }, [fetchWidgets]);
 
   const handleWidgetUpdate = useCallback(async (id, data, position, size) => {
     try {

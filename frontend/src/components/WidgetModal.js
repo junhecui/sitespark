@@ -21,15 +21,13 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
   const [linkType, setLinkType] = useState(data.pageLink ? 'page' : 'custom');
 
   const fetchPages = useCallback(async () => {
+    if (!widget.websiteId) {
+      console.error('No website ID found for widget:', widget);
+      return;
+    }
     try {
-      console.log(`Fetching website ID for widget: ${widget.id}`);
-      const response = await axios.get(`http://localhost:5001/api/page/${widget.pageId}/website`, {
-        headers: { 'x-auth-token': token }
-      });
-      const websiteId = response.data.websiteId;
-      console.log(`Fetching pages for website: ${websiteId}`);
-
-      const pagesResponse = await axios.get(`http://localhost:5001/api/website/${websiteId}/pages`, {
+      console.log(`Fetching pages for website: ${widget.websiteId}`);
+      const pagesResponse = await axios.get(`http://localhost:5001/api/website/${widget.websiteId}/pages`, {
         headers: { 'x-auth-token': token }
       });
       console.log('Pages fetched:', pagesResponse.data);
@@ -37,7 +35,7 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
     } catch (error) {
       console.error('Error fetching pages:', error);
     }
-  }, [widget.pageId, token]);
+  }, [widget.websiteId, token]);
 
   useEffect(() => {
     setData(widget.data);
@@ -54,24 +52,14 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
     setData({ ...data, [name]: type === 'checkbox' ? checked : value });
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      try {
-        const response = await axios.post('http://localhost:5001/api/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        const imageUrl = response.data.imageUrl;
-        setData({ ...data, imageUrl });
-      } catch (error) {
-        console.error('Error uploading image:', error);
-      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setData({ ...data, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
     }
   };
 

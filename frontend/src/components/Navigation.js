@@ -13,7 +13,7 @@ const Navigation = () => {
 
   return (
     <nav className="flex justify-between items-center p-4 bg-gray-800 text-white">
-      <h1 className="text-2xl">My App</h1>
+      <h1 className="text-2xl">SiteSpark</h1>
       <div>
         <Link to="/" className="mr-4">Home</Link>
         {token ? (

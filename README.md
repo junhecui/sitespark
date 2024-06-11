@@ -2,7 +2,7 @@
 
 SiteSpark is an introductory[^1], user-friendly web application that will allow interested or aspiring website builders to get a feel for designing web pages. It has basic and clear features and buttons to allow beginners to create and host their first website!
 
-[^1]: *SiteSpark is NOT a robust low code website builder, and it is advised that users look into other platforms if they wish to build a website for commercial use.*
+[^1]: *SiteSpark is NOT a robust low code website builder, and it is advised that users look into other platforms if they wish to build a website for commercial purposes.*
 
 ## Features
 
@@ -17,7 +17,7 @@ SiteSpark has a variety of widgets, including text, shapes, images, and charts. 
 ## Technologies Used
 
 * **JavaScript** was used to create an interactive **React** frontend and **Node.js** and **Express.js** server.
-* **Neo4j**, a graph database system was used to map the relationships between pages and widgets.
+* **Neo4j**, a graph database system was used to store websites, pages, and widgets, as well as map their relationships.
 * **AWS S3** buckets were used to store images and other data to prevent bloating of the Neo4j database.
 
 ## How to Use
