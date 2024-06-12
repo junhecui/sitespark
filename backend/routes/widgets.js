@@ -2,11 +2,42 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const { driver } = require('../db/neo4j');
-const upload = require('../middlewares/upload');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const { s3Image, imageBucketName, PutObjectCommand } = require('../db/s3Image');
 const { authenticateJWT } = require('./auth');
 
-router.post('/upload', upload.single('image'), (req, res) => {
-  res.json({ imageUrl: req.file.location });
+// Configure multer for handling file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
+
+// Route to handle image uploads
+router.post('/upload', upload.single('image'), async (req, res) => {
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+
+  const fileName = `${Date.now()}-${file.originalname}`;
+  const params = {
+    Bucket: imageBucketName,
+    Key: fileName,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+    ACL: 'public-read',
+  };
+
+  try {
+    const command = new PutObjectCommand(params);
+    const data = await s3Image.send(command);
+    const imageUrl = `https://${imageBucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+    res.status(200).json({ imageUrl });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 });
 
 // Route to create a new widget within a page

@@ -52,14 +52,25 @@ const WidgetModal = ({ widget, isOpen, onClose, onSave, onDelete, token }) => {
     setData({ ...data, [name]: type === 'checkbox' ? checked : value });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setData({ ...data, imageUrl: reader.result });
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await axios.post('http://localhost:5001/api/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-auth-token': token
+          }
+        });
+
+        const imageUrl = response.data.imageUrl;
+        setData({ ...data, imageUrl });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
     }
   };
 

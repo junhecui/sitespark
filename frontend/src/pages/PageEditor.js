@@ -185,7 +185,7 @@ const PageEditor = () => {
     } catch (error) {
       console.error('Error uploading image:', error);
     }
-  };
+  };  
 
   return (
     <div className="flex">
