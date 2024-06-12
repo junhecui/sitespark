@@ -30,6 +30,7 @@ router.post('/compile', async (req, res) => {
       const page = record.get('p').properties;
       const widgets = record.get('widgets').map(widgetRecord => {
         const widget = widgetRecord.properties;
+        console.log('Widget Data (raw):', widget);
         try {
           widget.data = JSON.parse(widget.data);
         } catch (e) {
@@ -53,7 +54,7 @@ router.post('/compile', async (req, res) => {
       return { ...page, widgets };
     });
 
-    console.log('Website Data:', websiteData);
+    console.log('Website Data:', JSON.stringify(websiteData, null, 2));
 
     if (websiteData.length === 0) {
       return res.status(404).json({ message: 'No data found for the given website ID' });
@@ -97,7 +98,11 @@ router.post('/compile', async (req, res) => {
 
 // Function to generate HTML for a page
 function generatePageHtml(page, isHomePage) {
-  const widgetsHtml = page.widgets.map(widget => generateWidgetHtml(widget)).join('');
+  const widgetsHtml = page.widgets.map(widget => {
+    const widgetHtml = generateWidgetHtml(widget);
+    console.log(`Adding widget ${widget.id} to page ${page.id}`, widget);
+    return widgetHtml;
+  }).join('');
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -110,7 +115,7 @@ function generatePageHtml(page, isHomePage) {
       </style>
     </head>
     <body>
-      <div class="boundary-box" style="width: 1200px; height: 800px; border: 2px solid black; position: relative; overflow: hidden;">
+      <div style="width: 100%; height: 100%; position: relative; overflow: hidden;">
         ${widgetsHtml}
       </div>
     </body>
