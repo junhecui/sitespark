@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const { session } = require('../db/neo4j');
+const generateHTML = require('../generateHTML');
 
 const router = express.Router();
 
@@ -12,7 +13,6 @@ router.post('/compile', async (req, res) => {
     console.log('Compiling website with ID:', websiteId);
     console.log('Home Page ID:', homePageId);
 
-    // Fetch website data
     const result = await session.run(`
       MATCH (w:Website {id: $websiteId})<-[:BELONGS_TO]-(p:Page)
       OPTIONAL MATCH (p)<-[:BELONGS_TO]-(widget:Widget)
@@ -75,24 +75,7 @@ router.post('/compile', async (req, res) => {
         }
       }).join('\n');
 
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${pageTitle}</title>
-          <style>
-            .widget-container { position: absolute; }
-          </style>
-        </head>
-        <body>
-          <div style="width: 100%; height: 100%; position: relative; overflow: hidden;">
-            ${widgetsHtml}
-          </div>
-        </body>
-        </html>
-      `;
+      const htmlContent = generateHTML(pageTitle, widgetsHtml);
 
       const filePath = path.join(outputDir, `page_${page.id}.html`);
       console.log(`Writing file ${filePath}`);
