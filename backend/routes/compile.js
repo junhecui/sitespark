@@ -14,7 +14,8 @@ router.post('/compile', async (req, res) => {
 
     // Fetch website data
     const result = await session.run(`
-      MATCH (w:Website {id: $websiteId})<-[:BELONGS_TO]-(p:Page)<-[:BELONGS_TO]-(widget:Widget)
+      MATCH (w:Website {id: $websiteId})<-[:BELONGS_TO]-(p:Page)
+      OPTIONAL MATCH (p)<-[:BELONGS_TO]-(widget:Widget)
       RETURN w, p, collect(widget) AS widgets
     `, { websiteId });
 
@@ -31,21 +32,13 @@ router.post('/compile', async (req, res) => {
         const widget = widgetRecord.properties;
         console.log('Widget Data (raw):', widget);
         try {
-          widget.data = JSON.parse(widget.data);
+          widget.data = JSON.parse(widget.data.replace(/\\\"/g, '"').slice(1, -1));
+          widget.position = JSON.parse(widget.position.replace(/\\\"/g, '"').slice(1, -1));
+          widget.size = JSON.parse(widget.size.replace(/\\\"/g, '"').slice(1, -1));
         } catch (e) {
           console.error('Error parsing widget data:', e);
           widget.data = {};
-        }
-        try {
-          widget.position = JSON.parse(widget.position);
-        } catch (e) {
-          console.error('Error parsing widget position:', e);
           widget.position = { x: 0, y: 0 };
-        }
-        try {
-          widget.size = JSON.parse(widget.size);
-        } catch (e) {
-          console.error('Error parsing widget size:', e);
           widget.size = { width: 100, height: 100 };
         }
         console.log('Parsed Widget Data:', widget);
@@ -69,14 +62,14 @@ router.post('/compile', async (req, res) => {
         switch (widget.type) {
           case 'text':
             return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px;">
-              <p style="font-size: ${widget.data.fontSize}px; color: ${widget.data.fontColor};">${widget.data.text}</p>
+              <p style="font-size: ${widget.data.fontSize || 16}px; color: ${widget.data.fontColor || '#000'};">${widget.data.text || ''}</p>
             </div>`;
           case 'image':
             return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px;">
-              <img src="${widget.data.imageUrl}" alt="Image" style="width: ${widget.size.width}px; height: ${widget.size.height}px;" />
+              <img src="${widget.data.imageUrl || ''}" alt="Image" style="width: ${widget.size.width}px; height: ${widget.size.height}px;" />
             </div>`;
           case 'shape':
-            return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px; width: ${widget.size.width}px; height: ${widget.size.height}px; background-color: ${widget.data.color};"></div>`;
+            return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px; width: ${widget.size.width}px; height: ${widget.size.height}px; background-color: ${widget.data.color || '#ccc'};"></div>`;
           default:
             return '';
         }
