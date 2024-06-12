@@ -1,7 +1,6 @@
-const { S3Client } = require('@aws-sdk/client-s3');
-require('dotenv').config();
+const { S3Client, PutObjectCommand, CopyObjectCommand } = require('@aws-sdk/client-s3');
 
-const s3Client = new S3Client({
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -9,4 +8,6 @@ const s3Client = new S3Client({
   },
 });
 
-module.exports = s3Client;
+const bucketName = process.env.AWS_S3_BUCKET_NAME;
+
+module.exports = { s3, bucketName, PutObjectCommand, CopyObjectCommand };

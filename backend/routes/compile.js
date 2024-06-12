@@ -1,8 +1,6 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const { session } = require('../db/neo4j');
-const { s3, bucketName } = require('../db/s3');
+const { s3, bucketName, PutObjectCommand, CopyObjectCommand } = require('../db/s3');
 const generateHTML = require('../generateHTML');
 
 const router = express.Router();
@@ -50,28 +48,31 @@ router.post('/compile', async (req, res) => {
 
     console.log('Website Data:', JSON.stringify(websiteData, null, 2));
 
-    // Generate HTML for each page
+    // Generate HTML for each page and upload to S3
     const uploadPromises = websiteData.map(page => {
       const htmlContent = generateHTML(page);
       const fileName = `page_${page.id}.html`;
       const fileContent = Buffer.from(htmlContent, 'utf8');
 
-      return s3.upload({
+      const params = {
         Bucket: bucketName,
         Key: `${websiteId}/${fileName}`,
         Body: fileContent,
         ContentType: 'text/html'
-      }).promise();
+      };
+
+      return s3.send(new PutObjectCommand(params));
     });
 
     await Promise.all(uploadPromises);
 
     const homePagePath = `${websiteId}/page_${homePageId}.html`;
-    await s3.copyObject({
+    const indexParams = {
       Bucket: bucketName,
       CopySource: `${bucketName}/${homePagePath}`,
       Key: `${websiteId}/index.html`
-    }).promise();
+    };
+    await s3.send(new CopyObjectCommand(indexParams));
 
     res.status(200).json({ message: 'Website compiled and uploaded successfully', websiteId });
   } catch (error) {

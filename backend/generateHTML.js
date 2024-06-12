@@ -1,4 +1,4 @@
-function generateHTML(page) {
+const generateHTML = (page) => {
     const pageTitle = page.name || 'Untitled Page';
     const widgetsHtml = page.widgets.map(widget => {
       switch (widget.type) {
@@ -36,6 +36,6 @@ function generateHTML(page) {
       </body>
       </html>
     `;
-  }
+  };
   
   module.exports = generateHTML;  
