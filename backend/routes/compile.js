@@ -9,8 +9,8 @@ router.post('/compile', async (req, res) => {
   const { websiteId, homePageId } = req.body;
 
   try {
-    console.log('Compiling website with ID:', websiteId); // Debugging log
-    console.log('Home Page ID:', homePageId); // Debugging log
+    console.log('Compiling website with ID:', websiteId);
+    console.log('Home Page ID:', homePageId);
 
     // Fetch website data
     const result = await session.run(`
@@ -19,10 +19,10 @@ router.post('/compile', async (req, res) => {
       RETURN w, p, collect(widget) AS widgets
     `, { websiteId });
 
-    console.log('Database Query Result:', result); // Debugging log
+    console.log('Database Query Result:', result);
 
     if (result.records.length === 0) {
-      console.error('No records found for the given website ID'); // Debugging log
+      console.error('No records found for the given website ID');
       return res.status(404).json({ message: 'No data found for the given website ID' });
     }
 
@@ -30,15 +30,30 @@ router.post('/compile', async (req, res) => {
       const page = record.get('p').properties;
       const widgets = record.get('widgets').map(widgetRecord => {
         const widget = widgetRecord.properties;
-        widget.data = JSON.parse(widget.data);
-        widget.position = JSON.parse(widget.position);
-        widget.size = JSON.parse(widget.size);
+        try {
+          widget.data = JSON.parse(widget.data);
+        } catch (e) {
+          console.error('Error parsing widget data:', e);
+          widget.data = {};
+        }
+        try {
+          widget.position = JSON.parse(widget.position);
+        } catch (e) {
+          console.error('Error parsing widget position:', e);
+          widget.position = { x: 0, y: 0 };
+        }
+        try {
+          widget.size = JSON.parse(widget.size);
+        } catch (e) {
+          console.error('Error parsing widget size:', e);
+          widget.size = { width: 100, height: 100 };
+        }
         return widget;
       });
       return { ...page, widgets };
     });
 
-    console.log('Website Data:', websiteData); // Debugging log
+    console.log('Website Data:', websiteData);
 
     if (websiteData.length === 0) {
       return res.status(404).json({ message: 'No data found for the given website ID' });
@@ -47,7 +62,7 @@ router.post('/compile', async (req, res) => {
     // Generate HTML for each page
     const htmlFiles = websiteData.map(page => {
       const pageHtml = generatePageHtml(page, homePageId === page.id);
-      console.log(`Generated HTML for page ${page.id}:`, pageHtml); // Debugging log
+      console.log(`Generated HTML for page ${page.id}:`, pageHtml);
       return { filename: `page_${page.id}.html`, content: pageHtml };
     });
 
@@ -57,10 +72,10 @@ router.post('/compile', async (req, res) => {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    console.log('Output Directory:', outputDir); // Debugging log
+    console.log('Output Directory:', outputDir);
 
     htmlFiles.forEach(file => {
-      console.log(`Writing file ${file.filename} to ${outputDir}`); // Debugging log
+      console.log(`Writing file ${file.filename} to ${outputDir}`);
       fs.writeFileSync(path.join(outputDir, file.filename), file.content);
     });
 
@@ -68,7 +83,7 @@ router.post('/compile', async (req, res) => {
     const homePage = websiteData.find(page => page.id === homePageId);
     if (homePage) {
       const homePageHtml = generatePageHtml(homePage, true);
-      console.log('Generated HTML for home page:', homePageHtml); // Debugging log
+      console.log('Generated HTML for home page:', homePageHtml);
       fs.writeFileSync(path.join(outputDir, 'index.html'), homePageHtml);
     }
 
@@ -95,7 +110,9 @@ function generatePageHtml(page, isHomePage) {
       </style>
     </head>
     <body>
-      ${widgetsHtml}
+      <div class="boundary-box" style="width: 1200px; height: 800px; border: 2px solid black; position: relative; overflow: hidden;">
+        ${widgetsHtml}
+      </div>
     </body>
     </html>
   `;
@@ -115,7 +132,7 @@ function generateWidgetHtml(widget) {
       widgetHtml = `<p style="font-size: ${widget.data.fontSize}px; color: ${widget.data.fontColor};">${widget.data.text}</p>`;
       break;
     case 'image':
-      widgetHtml = `<img src="${widget.data.imageUrl}" alt="${widget.data.altText}" style="width: ${widget.size.width}px; height: ${widget.size.height}px;" />`;
+      widgetHtml = `<img src="${widget.data.imageUrl}" alt="Image" style="width: ${widget.size.width}px; height: ${widget.size.height}px;" />`;
       break;
     case 'button':
       widgetHtml = `<button>${widget.data.text}</button>`;
