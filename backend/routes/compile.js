@@ -62,11 +62,15 @@ router.post('/compile', async (req, res) => {
         switch (widget.type) {
           case 'text':
             return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px;">
+              ${widget.data.clickable ? `<a href="${widget.data.link}" target="_blank">` : ''}
               <p style="font-size: ${widget.data.fontSize || 16}px; color: ${widget.data.fontColor || '#000'};">${widget.data.text || ''}</p>
+              ${widget.data.clickable ? `</a>` : ''}
             </div>`;
           case 'image':
             return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px;">
+              ${widget.data.clickable ? `<a href="${widget.data.link}" target="_blank">` : ''}
               <img src="${widget.data.imageUrl || ''}" alt="Image" style="width: ${widget.size.width}px; height: ${widget.size.height}px;" />
+              ${widget.data.clickable ? `</a>` : ''}
             </div>`;
           case 'shape':
             return `<div class="widget-container" style="left: ${widget.position.x}px; top: ${widget.position.y}px; width: ${widget.size.width}px; height: ${widget.size.height}px; background-color: ${widget.data.color || '#ccc'};"></div>`;

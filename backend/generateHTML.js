@@ -20,6 +20,9 @@ module.exports = function generateHTML(pageTitle, widgetsHtml) {
             position: relative;
             overflow: hidden;
           }
+          a {
+            text-decoration: none;
+          }
         </style>
       </head>
       <body>
