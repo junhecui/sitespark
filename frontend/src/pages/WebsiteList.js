@@ -9,6 +9,7 @@ const WebsiteList = () => {
   const { token } = useAuth();
 
   useEffect(() => {
+    document.title = 'Home'
     const fetchWebsites = async () => {
       try {
         const response = await axios.get('http://localhost:5001/api/websites', {

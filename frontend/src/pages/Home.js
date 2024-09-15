@@ -10,7 +10,9 @@ function Home() {
     axios.get('http://localhost:5001/api/pages')
       .then(response => setPages(response.data))
       .catch(error => console.error('Error fetching pages:', error));
+      document.title = 'Home'
   }, []);
+  
 
   const createPage = () => {
     axios.post('http://localhost:5001/api/pages', { name: newPageName })

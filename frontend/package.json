@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.2",
+    "chromedriver": "^128.0.3",
     "react": "^18.3.1",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
@@ -16,6 +15,7 @@
     "react-router-dom": "^6.23.1",
     "react-scripts": "5.0.1",
     "recharts": "^2.12.7",
+    "selenium-webdriver": "^4.24.0",
     "tailwindcss": "^3.4.3",
     "uuid": "^9.0.1",
     "web-vitals": "^2.1.4"
@@ -23,8 +23,21 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -43,5 +56,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.25.4",
+    "@babel/preset-react": "^7.24.7",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "babel-jest": "^29.7.0",
+    "jest": "^27.5.1"
   }
 }
