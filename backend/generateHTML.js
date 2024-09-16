@@ -7,15 +7,41 @@ const generateHTML = (page) => {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${page.name}</title>
       <style>
-        body {
-          font-family: Arial, sans-serif;
+        body, html {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: hidden;
+        }
+        .page-container {
+          position: relative;
+          width: 100%;
+          max-width: 1200px;
+          height: 675px;
+          transform-origin: top left;
         }
         .widget {
           position: absolute;
         }
+        /* Scale based on viewport width */
+        @media screen and (min-width: 800px) {
+          .page-container {
+            transform: scale(calc(100vw / 1200));
+          }
+        }
+        @media screen and (max-width: 800px) {
+          .page-container {
+            transform: scale(calc(100vw / 1200));
+          }
+        }
       </style>
     </head>
     <body>
+      <div class="page-container">
   `;
 
   page.widgets.forEach(widget => {
@@ -31,9 +57,17 @@ const generateHTML = (page) => {
         break;
 
       case 'image':
-        html += `
-          <img class="widget" src="${data.imageUrl}" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px;" alt="">
-        `;
+        let imageTag = `<img class="widget" src="${data.imageUrl}" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px;" alt="">`;
+
+        if (data.clickable) {
+          if (data.link) {
+            imageTag = `<a href="${data.link}" target="_blank">${imageTag}</a>`;
+          } else if (data.pageLink) {
+            imageTag = `<a href="page_${data.pageLink}.html">${imageTag}</a>`;
+          }
+        }
+
+        html += imageTag;
         break;
 
       case 'shape':
@@ -57,6 +91,7 @@ const generateHTML = (page) => {
   });
 
   html += `
+      </div>
     </body>
     </html>
   `;
