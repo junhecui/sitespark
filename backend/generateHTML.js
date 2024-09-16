@@ -27,7 +27,14 @@ const generateHTML = (page) => {
         .widget {
           position: absolute;
         }
-        /* Scale based on viewport width */
+        a {
+          text-decoration: none;
+          color: inherit;
+        }
+        a:hover, a:visited, a:focus {
+          color: inherit;
+        }
+
         @media screen and (min-width: 800px) {
           .page-container {
             transform: scale(calc(100vw / 1200));
@@ -47,9 +54,11 @@ const generateHTML = (page) => {
   page.widgets.forEach(widget => {
     const { type, data, position, size } = widget;
 
+    let widgetContent = '';
+
     switch (type) {
       case 'text':
-        html += `
+        widgetContent = `
           <div class="widget" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px; font-size: ${data.fontSize || '16'}px; font-family: ${data.fontFamily || 'Arial'}, sans-serif;">
             ${data.text || ''}
           </div>
@@ -57,28 +66,18 @@ const generateHTML = (page) => {
         break;
 
       case 'image':
-        let imageTag = `<img class="widget" src="${data.imageUrl}" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px;" alt="">`;
-
-        if (data.clickable) {
-          if (data.link) {
-            imageTag = `<a href="${data.link}" target="_blank">${imageTag}</a>`;
-          } else if (data.pageLink) {
-            imageTag = `<a href="page_${data.pageLink}.html">${imageTag}</a>`;
-          }
-        }
-
-        html += imageTag;
+        widgetContent = `<img class="widget" src="${data.imageUrl}" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px;" alt="">`;
         break;
 
       case 'shape':
-        html += `
+        widgetContent = `
           <div class="widget" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px; background-color: ${data.color || 'gray'};">
           </div>
         `;
         break;
 
       case 'button':
-        html += `
+        widgetContent = `
           <a href="${data.link || '#'}" class="widget" style="left: ${position.x}px; top: ${position.y}px; width: ${size.width}px; height: ${size.height}px;">
             <button style="width: 100%; height: 100%;">${data.text || 'Click'}</button>
           </a>
@@ -88,6 +87,16 @@ const generateHTML = (page) => {
       default:
         console.warn(`Unknown widget type: ${type}`);
     }
+
+      if (data.clickable) {
+        if (data.link) {
+          widgetContent = `<a href="${data.link}" target="_blank">${widgetContent}</a>`;
+        } else if (data.pageLink) {
+          widgetContent = `<a href="page_${data.pageLink}.html">${widgetContent}</a>`;
+        }
+      }
+
+      html += widgetContent;
   });
 
   html += `
