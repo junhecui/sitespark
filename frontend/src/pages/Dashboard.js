@@ -22,10 +22,6 @@ function Dashboard() {
   ]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.title = 'Dashboard';
-  }, []);
-
   const fetchWidgets = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:5001/api/widgets');

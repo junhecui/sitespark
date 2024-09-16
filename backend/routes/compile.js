@@ -18,8 +18,6 @@ router.post('/compile', async (req, res) => {
       RETURN w, p, collect(widget) AS widgets
     `, { websiteId });
 
-    console.log('Database Query Result:', JSON.stringify(result, null, 2));
-
     if (result.records.length === 0) {
       console.error('No records found for the given website ID');
       return res.status(404).json({ message: 'No data found for the given website ID' });
@@ -29,7 +27,6 @@ router.post('/compile', async (req, res) => {
       const page = record.get('p').properties;
       const widgets = record.get('widgets').map(widgetRecord => {
         const widget = widgetRecord.properties;
-        console.log('Widget Data (raw):', widget);
         try {
           widget.data = JSON.parse(widget.data.replace(/\\\"/g, '"').slice(1, -1));
           widget.position = JSON.parse(widget.position.replace(/\\\"/g, '"').slice(1, -1));
@@ -40,15 +37,11 @@ router.post('/compile', async (req, res) => {
           widget.position = { x: 0, y: 0 };
           widget.size = { width: 100, height: 100 };
         }
-        console.log('Parsed Widget Data:', widget);
         return widget;
       });
       return { ...page, widgets };
     });
 
-    console.log('Website Data:', JSON.stringify(websiteData, null, 2));
-
-    // Generate HTML for each page and upload to S3
     const uploadPromises = websiteData.map(page => {
       const htmlContent = generateHTML(page);
       const fileName = `page_${page.id}.html`;

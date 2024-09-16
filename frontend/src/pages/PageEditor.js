@@ -35,6 +35,7 @@ const PageEditor = () => {
   }, [pageId, token]);
 
   useEffect(() => {
+    document.title = 'Editor';
     fetchWebsiteId();
   }, [fetchWebsiteId]);
 
@@ -192,7 +193,7 @@ const PageEditor = () => {
       <Sidebar onAddWidget={handleAddWidget} />
       <div className="flex-1 p-4 bg-gray-100 rounded relative">
         <h1 className="text-2xl font-bold mb-4">Page Editor</h1>
-        <div className="boundary-box" ref={boundaryBoxRef} style={{ width: '1200px', height: '800px', border: '2px solid black', position: 'relative', overflow: 'hidden' }}>
+        <div className="boundary-box" ref={boundaryBoxRef} style={{ width: '1200px', height: '675px', border: '2px solid black', position: 'relative', overflow: 'hidden' }}>
           {widgets.map(renderWidget)}
         </div>
       </div>
