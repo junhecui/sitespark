@@ -8,7 +8,7 @@ let driver;
 beforeAll(async () => {
   const chromeOptions = new chrome.Options();
   chromeOptions.addArguments('--headless');
-  driver = await new Builder().forBrowser('chrome').build();
+  driver = await new Builder().forBrowser('chrome').setChromeOptions(chromeOptions).build();
   await driver.manage().setTimeouts({ implicit: 10000 });
   await login(driver);
 });

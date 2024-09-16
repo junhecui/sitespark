@@ -52,7 +52,6 @@ const WebsiteList = () => {
     }
   
     try {
-      // Assuming your compilation logic sends the request to the backend
       await axios.post('http://localhost:5001/api/compile', {
         websiteId,
         homePageId
@@ -60,10 +59,8 @@ const WebsiteList = () => {
         headers: { 'x-auth-token': token }
       });
   
-      // After successful compilation, construct the URL in the known format
       const compiledUrl = `https://sitespark.s3.us-west-2.amazonaws.com/${websiteId}/page_${homePageId}.html`;
   
-      // Set the compiled URL for the website
       setCompiledUrls((prevState) => ({
         ...prevState,
         [websiteId]: compiledUrl
@@ -118,7 +115,7 @@ const WebsiteList = () => {
               Compile
             </button>
 
-            {/* Ensure compiled URL is set before displaying the View button */}
+            {}
             {compiledUrls[website.id] && (
               <>
                 <a
