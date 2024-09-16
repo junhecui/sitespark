@@ -38,6 +38,17 @@ const WebsiteList = () => {
     }
   };
 
+  const deleteWebsite = async (websiteId) => {
+    try {
+      await axios.delete(`http://localhost:5001/api/website/${websiteId}`, {
+        headers: { 'x-auth-token': token }
+      });
+      setWebsites(websites.filter(website => website.id !== websiteId));
+    } catch (error) {
+      console.error('Error deleting website:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Websites</h1>
@@ -63,6 +74,11 @@ const WebsiteList = () => {
                 View Compiled Website
               </a>
             )}
+            <button
+                onClick={() => deleteWebsite(website.id)} // Add the delete function
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-4"
+              >Delete
+              </button>
           </li>
         ))}
       </ul>

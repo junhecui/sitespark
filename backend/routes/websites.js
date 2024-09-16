@@ -4,7 +4,6 @@ const { v4: uuidv4 } = require('uuid');
 const { session } = require('../db/neo4j');
 const { authenticateJWT } = require('./auth');
 
-// Route to create a new website
 router.post('/website', authenticateJWT, async (req, res) => {
   const { name } = req.body;
   const userId = req.user.id;
@@ -22,7 +21,28 @@ router.post('/website', authenticateJWT, async (req, res) => {
   }
 });
 
-// Route to get all websites for a specific user
+router.delete('/website/:websiteId', authenticateJWT, async (req, res) => {
+  const { websiteId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    await session.run(
+      'MATCH (w:Website {id: $websiteId, userId: $userId})-[:HAS_PAGE]->(p:Page) DETACH DELETE p',
+      { websiteId, userId }
+    );
+
+    await session.run(
+      'MATCH (w:Website {id: $websiteId, userId: $userId}) DETACH DELETE w',
+      { websiteId, userId }
+    );
+
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting website:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
 router.get('/websites', authenticateJWT, async (req, res) => {
   const userId = req.user.id;
 
@@ -39,7 +59,6 @@ router.get('/websites', authenticateJWT, async (req, res) => {
   }
 });
 
-// Route to create a new page within a website
 router.post('/website/:websiteId/page', authenticateJWT, async (req, res) => {
   const { websiteId } = req.params;
   const { name } = req.body;
@@ -58,7 +77,6 @@ router.post('/website/:websiteId/page', authenticateJWT, async (req, res) => {
   }
 });
 
-// Route to get all pages within a website for a specific user
 router.get('/website/:websiteId/pages', authenticateJWT, async (req, res) => {
   const { websiteId } = req.params;
   const userId = req.user.id;
@@ -76,7 +94,6 @@ router.get('/website/:websiteId/pages', authenticateJWT, async (req, res) => {
   }
 });
 
-// Route to delete a page by its ID
 router.delete('/pages/:id', authenticateJWT, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;

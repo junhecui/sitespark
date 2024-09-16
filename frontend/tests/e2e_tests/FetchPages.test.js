@@ -1,9 +1,13 @@
 const { Builder, By, until } = require('selenium-webdriver');
+const { login } = require('./login.js');
+const chrome = require('selenium-webdriver/chrome');
 require('chromedriver');
 
 let driver;
 
 beforeAll(async () => {
+  const chromeOptions = new chrome.Options();
+  chromeOptions.addArguments('--headless');
   driver = await new Builder().forBrowser('chrome').build();
   await driver.manage().setTimeouts({ implicit: 10000 });
 });
